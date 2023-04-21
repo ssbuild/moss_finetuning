@@ -61,7 +61,7 @@ train_info_args = {
     'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft',
     'convert_onnx': False, # 转换onnx模型
     'do_train': True,
-    'train_file':  [ './data/finetune_train_examples.json'],
+    'train_file':  [ './data/train.json'],
     'max_epochs': 20,
     'max_steps': -1,
     'optimizer': 'lion', # one of adamw,adam,lamb,lion

@@ -128,7 +128,6 @@ data_conf = {
         'stride': int(train_info_args['max_seq_length'] / 3 * 2),
     },
     DataStrategy.mos_rounds: {
-
     }
 }
 
@@ -139,15 +138,6 @@ def get_deepspeed_config():
     with open('./deepspeed.json', mode='r', encoding='utf-8') as f:
         deepspeed_config = json.loads(f.read())
     return deepspeed_config
-
-def preprocess(text):
-  #text = text.replace("\n", "\\n").replace("\t", "\\t")
-  return text
-
-def postprocess(text):
-  # return text.replace("\\n", "\n").replace("\\t", "\t")
-  return text
-
 
 
 class NN_DataHelper(DataHelper):

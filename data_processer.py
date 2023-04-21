@@ -132,17 +132,12 @@ class TokenRoundsForMoss:
                     # The format tokens (<|Results|>:...<eor>\n) should have losses.
                     cur_no_loss_spans.append(
                         (len(input_ids + cur_turn_ids) + 5, len(input_ids + cur_turn_ids + cur_ids) - 2))
-
                 assert isinstance(cur_ids, list) and len(cur_ids) > 0
-
                 cur_turn_ids.extend(cur_ids)
-
             if len(input_ids + cur_turn_ids) > max_seq_length - 1:
                 break
-
             input_ids.extend(cur_turn_ids)
             no_loss_spans.extend(cur_no_loss_spans)
-
         input_ids.append(config.eos_token_id)
         labels = copy.deepcopy(input_ids)
         for no_loss_span in no_loss_spans:

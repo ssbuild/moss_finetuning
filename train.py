@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,config_class_name=MossConfig)
     config.torch_dtype = "float16"
-    config.n_layer = 1
+    # config.n_layer = 1
     # 额外参数
     checkpoint_callback.tokenizer = tokenizer
     checkpoint_callback.data_args = data_args

@@ -23,10 +23,14 @@ for file in filenames:
         paragraph = []
         for i in range(num_turns):
             chat = chats['turn_{}'.format(i+1)]
-            chat['q'] = chat.pop('Human')
-            chat['a'] = chat.pop('MOSS')
-            paragraph.append(chat)
-
+            o = {}
+            for k,v in chat.items():
+                if k == 'Human':
+                    k = 'q'
+                elif k == 'MOSS':
+                    k = 'a'
+                o[k] = v
+            paragraph.append(o)
 
         D.append({
             'paragraph': paragraph,

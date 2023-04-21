@@ -12,6 +12,7 @@ class DataStrategy(Enum):
     sup = 1
     unsup = 2
     sub_rounds = 3
+    mos_rounds = 4
 
 class TokenIdsFinal:
     @classmethod
@@ -38,7 +39,8 @@ class TokenUnSupervision:
     @classmethod
     def process(cls, tokenizer: PreTrainedTokenizer,config,stride, max_seq_length, examples):
         input_ids_all = []
-        for idx, (question, answer) in enumerate(examples):
+        for idx, session in enumerate(examples):
+            question, answer = session['q'], session['a']
             text = question + answer
             ids = tokenizer.encode(text=text)
             if len(ids) <= 3:
@@ -65,7 +67,8 @@ class TokenSupervision:
     @classmethod
     def process(cls, tokenizer: PreTrainedTokenizer,config,stride, max_seq_length, examples):
         ds = []
-        for idx, (question, answer) in enumerate(examples):
+        for idx, session in enumerate(examples):
+            question, answer = session['q'], session['a']
             a_ids = tokenizer.encode(text=question,add_special_tokens=False)[:max_seq_length-2]
             b_ids = tokenizer.encode(text=answer, add_special_tokens=False)
             assert len(b_ids)
@@ -85,7 +88,8 @@ class TokenSupervisionRounds:
     def process(cls, tokenizer: PreTrainedTokenizer,config,stride, max_seq_length, examples):
         ds = []
         prompt_text = ''
-        for idx, (question, answer) in enumerate(examples):
+        for idx, session in enumerate(examples):
+            question, answer = session['q'], session['a']
             if idx == 0:
                 a_text = question
             else:
@@ -107,3 +111,41 @@ class TokenSupervisionRounds:
                 d = TokenIdsFinal.process(tokenizer, input_ids, labels, max_seq_length)
                 ds.append(d)
         return ds
+
+class TokenRoundsForMoss:
+    @classmethod
+    def process(cls, tokenizer: PreTrainedTokenizer,config,max_seq_length, examples):
+
+        meta_instruction = examples['meta_instruction']
+        instruction_ids = tokenizer.encode(meta_instruction)
+        assert isinstance(instruction_ids, list) and len(instruction_ids) > 0
+
+        input_ids = copy.deepcopy(instruction_ids)
+        no_loss_spans = [(0, len(instruction_ids))]
+
+        for idx, session in enumerate(examples):
+            cur_turn_ids = []
+            cur_no_loss_spans = []
+            for key, value in session.items():
+                cur_ids = tokenizer.encode(value)
+                if key == 'Tool Responses':
+                    # The format tokens (<|Results|>:...<eor>\n) should have losses.
+                    cur_no_loss_spans.append(
+                        (len(input_ids + cur_turn_ids) + 5, len(input_ids + cur_turn_ids + cur_ids) - 2))
+
+                assert isinstance(cur_ids, list) and len(cur_ids) > 0
+
+                cur_turn_ids.extend(cur_ids)
+
+            if len(input_ids + cur_turn_ids) > max_seq_length - 1:
+                break
+
+            input_ids.extend(cur_turn_ids)
+            no_loss_spans.extend(cur_no_loss_spans)
+
+        input_ids.append(config.eos_token_id)
+        labels = copy.deepcopy(input_ids)
+        for no_loss_span in no_loss_spans:
+            labels[no_loss_span[0]: no_loss_span[1]] = -100
+        d = TokenIdsFinal.process(tokenizer, input_ids, labels, max_seq_length)
+        return [d]

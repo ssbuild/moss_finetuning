@@ -18,7 +18,8 @@ from tqdm import tqdm
 from transformers import HfArgumentParser,PreTrainedTokenizer
 from models import MyTransformer,MossConfig,MossTokenizer
 
-from data_processer import DataStrategy, TokenSupervision, TokenUnSupervision, TokenSupervisionRounds
+from data_processer import DataStrategy, TokenSupervision, TokenUnSupervision, TokenSupervisionRounds, \
+    TokenRoundsForMoss
 
 lora_info_args = {
     'with_lora': True,  # 是否启用lora模块
@@ -125,6 +126,9 @@ data_conf = {
     },
     DataStrategy.sub_rounds: {
         'stride': int(train_info_args['max_seq_length'] / 3 * 2),
+    },
+    DataStrategy.mos_rounds: {
+
     }
 }
 
@@ -173,6 +177,10 @@ class NN_DataHelper(DataHelper):
             ds = TokenSupervisionRounds.process(tokenizer, config=config, max_seq_length=max_seq_length,
                                                 examples=examples,
                                                 **data_conf[strategy])
+        elif strategy == DataStrategy.mos_rounds:
+            ds = TokenRoundsForMoss.process(tokenizer, config=config, max_seq_length=max_seq_length,
+                                                examples=examples,
+                                                **data_conf[strategy])
         else:
             raise ValueError('Invalid strategy', strategy)
         if not ds:
@@ -215,12 +223,9 @@ class NN_DataHelper(DataHelper):
                 sub = []
                 # 自行做模板
                 for session in paragraph:
-                    q = session['q']
-                    answers_list = session['a']
-                    # q = preprocess('Human：' + q + '\nAssistant：')
-                    answers = preprocess('\n'.join(answers_list))
-                    assert len(answers), ValueError('answer cannot empty')
-                    sub.append((q, answers))
+                    a = session['a']
+                    assert len(a), ValueError('answer cannot empty')
+                    sub.append(session)
                 D.append(copy.deepcopy(sub))
                 sub.clear()
 

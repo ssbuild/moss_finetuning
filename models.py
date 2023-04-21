@@ -94,7 +94,7 @@ class MyMossForCausalLM(MossForCausalLM):
     @torch.no_grad()
     def chat(self,tokenizer, text: str, **kwargs):
         kwargs.update(self.extra_param.param)
-        tokens = tokenizer.batch_encode_plus([self.self.extra_param.prefix + text], return_tensors="pt")
+        tokens = tokenizer.batch_encode_plus([self.extra_param.prefix + text], return_tensors="pt")
         input_ids, attention_mask = tokens['input_ids'], tokens['attention_mask']
         outputs = self.chat_inner(input_ids, attention_mask,**kwargs)
         preds = tokenizer.batch_decode(outputs)

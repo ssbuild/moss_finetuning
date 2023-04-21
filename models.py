@@ -139,7 +139,7 @@ class MyMossForCausalLM(MossForCausalLM):
 
             if i == 0:
                 logits = logits.gather(1,
-                                       last_token_indices.view(self.bsz, 1, 1).repeat(1, 1, self.vocab_size)).squeeze(1)
+                                       last_token_indices.view(self.bsz, 1, 1).repeat(1, 1, self.config.vocab_size)).squeeze(1)
             else:
                 logits = logits[:, -1, :]
 

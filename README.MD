@@ -68,8 +68,6 @@
 - lora
 - 正常微调
 ```text
-    训练精度 可以修改 config.json precision 16 32
-    如果优化器不是lion ,可以尝试将config/config.json precision 改为32 ，然后修改 train.py Trainner 添加参数 precision=16 或者precision='bf16'
     python train.py
 ```
 

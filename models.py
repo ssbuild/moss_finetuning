@@ -46,6 +46,22 @@ class DefaultParam:
 
         self._prefix = PREFIX
 
+        self.is_inited = False
+
+
+    def init_control(self,tokenizer):
+        if self.is_inited:
+            return
+        self.is_inited = True
+        self.moss_startwords = torch.LongTensor([27, 91, 44, 18420, 91, 31175])
+        self.tool_startwords = torch.LongTensor([27, 91, 6935, 1746, 91, 31175])
+        self.tool_specialwords = torch.LongTensor([6045])
+
+        self.innerthought_stopwords = torch.LongTensor([tokenizer.convert_tokens_to_ids("<eot>")])
+        self.tool_stopwords = torch.LongTensor([tokenizer.convert_tokens_to_ids("<eoc>")])
+        self.result_stopwords = torch.LongTensor([tokenizer.convert_tokens_to_ids("<eor>")])
+        self.moss_stopwords = torch.LongTensor([tokenizer.convert_tokens_to_ids("<eom>")])
+
 
     @property
     def param(self):
@@ -93,6 +109,7 @@ class MyMossForCausalLM(MossForCausalLM):
 
     @torch.no_grad()
     def chat(self,tokenizer, text: str, **kwargs):
+        self.extra_param.init_control(tokenizer)
         kwargs.update(self.extra_param.param)
         tokens = tokenizer.batch_encode_plus([self.extra_param.prefix + text], return_tensors="pt")
         input_ids, attention_mask = tokens['input_ids'], tokens['attention_mask']
@@ -126,13 +143,13 @@ class MyMossForCausalLM(MossForCausalLM):
         input_ids, attention_mask = input_ids.to('cuda'), attention_mask.to('cuda')
         last_token_indices = attention_mask.sum(1) - 1
 
-        moss_stopwords = self.moss_stopwords.to(input_ids.device)
+        moss_stopwords = self.extra_param.moss_stopwords.to(input_ids.device)
 
-        queue_for_moss_stopwords = torch.empty(size=(self.bsz, len(self.moss_stopwords)), device=input_ids.device,
+        queue_for_moss_stopwords = torch.empty(size=(self.bsz, len(self.extra_param.moss_stopwords)), device=input_ids.device,
                                                dtype=input_ids.dtype)
-        queue_for_tool_startwords = torch.empty(size=(self.bsz, len(self.tool_startwords)), device=input_ids.device,
+        queue_for_tool_startwords = torch.empty(size=(self.bsz, len(self.extra_param.tool_startwords)), device=input_ids.device,
                                                 dtype=input_ids.dtype)
-        queue_for_tool_stopwords = torch.empty(size=(self.bsz, len(self.tool_stopwords)), device=input_ids.device,
+        queue_for_tool_stopwords = torch.empty(size=(self.bsz, len(self.extra_param.tool_stopwords)), device=input_ids.device,
                                                dtype=input_ids.dtype)
 
         all_shall_stop = torch.tensor([False] * self.bsz, device=input_ids.device)
@@ -170,7 +187,7 @@ class MyMossForCausalLM(MossForCausalLM):
 
             cur_len = i
             if cur_len > int(regulation_start):
-                for i in self.moss_stopwords:
+                for i in self.extra_param.moss_stopwords:
                     probabilities[:, i] = probabilities[:, i] * pow(length_penalty, cur_len - regulation_start)
 
             new_generated_id = torch.multinomial(probabilities, 1)

@@ -1,8 +1,7 @@
-## 测试中
+## 状态 测试中 ...
 
 ## 1.安装
   - pip install -i https://pypi.org/simple -U deep_training>=0.1.3rc0 deepspeed
-    
 
 ## 2.更新详情
 - [deep_training](https://github.com/ssbuild/deep_training)
@@ -23,12 +22,8 @@
 - [moss-moon-003-sft-plugin](https://huggingface.co/fnlp/moss-moon-003-sft-plugin)
     
 
-
-
-
 ## 5.数据示例
-    给出一种qa 数据示例.
-    单条数据示例1
+    数据示例如下:
 ```json
 {
    "paragraph": [{

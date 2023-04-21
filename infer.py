@@ -17,6 +17,7 @@ if __name__ == '__main__':
     tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(
         tokenizer_class_name=MossTokenizer, config_class_name=MossConfig)
     config.torch_dtype = "float16"
+    # config.n_layer = 1
 
     pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args)
     model = pl_model.get_llm_model()
@@ -24,18 +25,18 @@ if __name__ == '__main__':
     model = model.eval()
 
     # 注意 长度不等于2048 会影响效果
-    response, history = model.chat(tokenizer, "你好", history=[],max_length=2048,
+    response = model.chat(tokenizer, "你好", history=[],max_length=2048,
                                    eos_token_id=config.eos_token_id,
                                    do_sample=True, top_p=0.7, temperature=0.95,
                                    )
     print('你好',' ',response)
 
-    response, history = model.chat(tokenizer, "晚上睡不着应该怎么办", history=history,max_length=2048,
+    response = model.chat(tokenizer, "晚上睡不着应该怎么办", max_length=2048,
                                    eos_token_id=config.eos_token_id,
                                    do_sample=True, top_p=0.7, temperature=0.95,
                                    )
     print('晚上睡不着应该怎么办',' ',response)
 
-    # response, history = base_model.chat(tokenizer, "写一个诗歌，关于冬天", history=[],max_length=30)
+    # response = base_model.chat(tokenizer, "写一个诗歌，关于冬天", history=[],max_length=30)
     # print('写一个诗歌，关于冬天',' ',response)
 

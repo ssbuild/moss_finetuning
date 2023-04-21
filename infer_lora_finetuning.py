@@ -37,12 +37,12 @@ if __name__ == '__main__':
     model.half().cuda()
     model = model.eval()
 
-    response, history = model.chat(tokenizer, "写一个诗歌，关于冬天", history=[],max_length=2048,
+    response = model.chat(tokenizer, "写一个诗歌，关于冬天", history=[],max_length=2048,
                                         eos_token_id=config.eos_token_id,
                                         do_sample=True, top_p=0.7, temperature=0.95,)
     print('写一个诗歌，关于冬天',' ',response)
 
-    response, history = model.chat(tokenizer, "晚上睡不着应该怎么办", history=[],max_length=2048,
+    response = model.chat(tokenizer, "晚上睡不着应该怎么办", history=[],max_length=2048,
                                         eos_token_id=config.eos_token_id,
                                         do_sample=True, top_p=0.7, temperature=0.95,)
     print('晚上睡不着应该怎么办',' ',response)

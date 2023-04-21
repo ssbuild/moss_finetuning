@@ -89,15 +89,15 @@ class MyMossForCausalLM(MossForCausalLM):
     #     response = tokenizer.decode(outputs)
     #     response = self.process_response(response)
     #     history = history + [(query, response)]
-    #     return response, history
+    #     return response
 
     @torch.no_grad()
-    def chat(self, text: str, **kwargs):
+    def chat(self,tokenizer, text: str, **kwargs):
         kwargs.update(self.extra_param.param)
-        tokens = self.tokenizer.batch_encode_plus([self.self.extra_param.prefix + text], return_tensors="pt")
+        tokens = tokenizer.batch_encode_plus([self.self.extra_param.prefix + text], return_tensors="pt")
         input_ids, attention_mask = tokens['input_ids'], tokens['attention_mask']
         outputs = self.chat_inner(input_ids, attention_mask,**kwargs)
-        preds = self.tokenizer.batch_decode(outputs)
+        preds = tokenizer.batch_decode(outputs)
         res = self.postprocess_remove_prefix(preds[0])
         return res
 
@@ -115,6 +115,7 @@ class MyMossForCausalLM(MossForCausalLM):
                length_penalty=1,
                max_time=60,
                extra_ignored_tokens=None,
+               **kwargs,
                ):
         """
         """
@@ -274,7 +275,7 @@ class MyTransformer(MyTransformerMossForCausalLM, with_pl=True):
                         print('freeze layer',param[0])
 
 
-    def get_llm_model(self) -> MyTransformerMossForCausalLM:
+    def get_llm_model(self) -> MyMossForCausalLM:
         if self.lora_args is not None and self.lora_args.with_lora:
             return self.backbone.model.model
         return self.backbone.model

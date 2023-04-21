@@ -225,7 +225,7 @@ class MyMossForCausalLM(MossForCausalLM):
         """
         inputs = {"input_ids": input_ids, "attention_mask": attention_mask, "past_key_values": past_key_values}
         with torch.no_grad():
-            outputs = self.model(**inputs)
+            outputs = self.forward(**inputs)
 
         return outputs.logits, outputs.past_key_values
 

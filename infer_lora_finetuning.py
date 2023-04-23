@@ -38,7 +38,7 @@ if __name__ == '__main__':
     model = model.eval()
 
     query = "<|Human|>: 你好<eoh>\n<|MOSS|>:"
-    response = model.chat(tokenizer, query, history=[], max_length=2048,
+    response = model.chat(tokenizer, query,  max_length=2048,
                           eos_token_id=config.eos_token_id,
                           do_sample=True, top_p=0.7, temperature=0.95,
                           )

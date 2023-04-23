@@ -60,6 +60,11 @@ train_info_args = {
     'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft',
     'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft/config.json',
     'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft',
+
+    # 'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4',
+    # 'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4/config.json',
+    # 'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4',
+
     'convert_onnx': False, # 转换onnx模型
     'do_train': True,
     'train_file':  [ './data/train.json'],

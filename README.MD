@@ -2,6 +2,7 @@
 
 ## 1.安装
   - pip install -i https://pypi.org/simple -U deep_training>=0.1.3rc0 deepspeed
+  - pip install triton #如果推理量化模
 
 ## 2.更新详情
 - [deep_training](https://github.com/ssbuild/deep_training)

@@ -1,3 +1,6 @@
+##  
+    4月23日 增加lora merge权重（修改infer_lora_finetuning.py enable_merge_weight 选项）
+
 ## 1.安装
   - pip install --pre -i https://pypi.org/simple -U deep_training deepspeed
   - pip install triton #如果推理量化模

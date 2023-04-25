@@ -115,15 +115,14 @@ class TokenSupervisionRounds:
 class TokenRoundsForMoss:
     @classmethod
     def process(cls, tokenizer: PreTrainedTokenizer,config,max_seq_length, examples):
-
-        meta_instruction = examples['meta_instruction']
+        meta_instruction = examples[0]
         instruction_ids = tokenizer.encode(meta_instruction)
         assert isinstance(instruction_ids, list) and len(instruction_ids) > 0
 
         input_ids = copy.deepcopy(instruction_ids)
         no_loss_spans = [(0, len(instruction_ids))]
 
-        for idx, session in enumerate(examples):
+        for idx, session in enumerate(examples[1]):
             cur_turn_ids = []
             cur_no_loss_spans = []
             for key, value in session.items():
@@ -139,7 +138,7 @@ class TokenRoundsForMoss:
             input_ids.extend(cur_turn_ids)
             no_loss_spans.extend(cur_no_loss_spans)
         input_ids.append(config.eos_token_id)
-        labels = copy.deepcopy(input_ids)
+        labels = np.asarray(copy.deepcopy(input_ids),dtype=np.int32)
         for no_loss_span in no_loss_spans:
             labels[no_loss_span[0]: no_loss_span[1]] = -100
         d = TokenIdsFinal.process(tokenizer, input_ids, labels, max_seq_length)

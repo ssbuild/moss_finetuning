@@ -204,6 +204,7 @@ class NN_DataHelper(DataHelper):
     # 读取文件
     def on_get_corpus(self, files: typing.List, mode: str):
         D = []
+        strategy = data_conf['strategy']
         for file in files:
             with open(file, mode='r', encoding='utf-8', newline='\n') as f:
                 lines = f.readlines()
@@ -221,7 +222,10 @@ class NN_DataHelper(DataHelper):
                     a = session['a']
                     assert len(a), ValueError('answer cannot empty')
                     sub.append(session)
-                D.append(copy.deepcopy(sub))
+                if strategy == DataStrategy.mos_rounds:
+                   D.append((jd['meta_instruction'],copy.deepcopy(sub)))
+                else:
+                    D.append(copy.deepcopy(sub))
                 sub.clear()
 
         return D

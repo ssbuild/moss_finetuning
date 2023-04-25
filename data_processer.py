@@ -109,8 +109,6 @@ class TokenSupervisionRounds:
                 labels = [config.bos_token_id] + labels_all[pos: pos + max_seq_length - 1]
                 pos += stride
                 d = TokenIdsFinal.process(tokenizer, input_ids, labels, max_seq_length)
-                if np.all(d['labels'] == -100):
-                    continue
                 ds.append(d)
         return ds
 

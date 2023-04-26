@@ -5,9 +5,9 @@ import torch
 from deep_training.data_helper import ModelArguments, DataArguments, TrainingArguments
 from deep_training.nlp.models.lora.v2 import LoraArguments
 from deep_training.utils.trainer import ModelCheckpoint, SimpleModelCheckpoint
-from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks.lr_monitor import LearningRateMonitor
-from pytorch_lightning.strategies import DeepSpeedStrategy
+from lightning import Trainer
+from lightning.pytorch.callbacks import LearningRateMonitor
+from lightning.pytorch.strategies import DeepSpeedStrategy
 from transformers import HfArgumentParser
 
 from data_utils import NN_DataHelper, train_info_args, get_deepspeed_config

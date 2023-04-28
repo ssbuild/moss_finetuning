@@ -154,14 +154,16 @@ if __name__ == '__main__':
         #         pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,lora_config=lora_args,is_trainable=True,strict=False)
 
         def dataset_loader_filter_fn(dataset):
-            print('*' * 30,'total',len(dataset))
+            print('*' * 30, 'total', len(dataset))
             return dataset
+
+
         train_datasets = dataHelper.load_distributed_random_sampler(
             dataHelper.train_files,
-            with_load_memory=True,
+            with_load_memory=data_args.data_backend == 'record',
             collate_fn=dataHelper.collate_fn,
             batch_size=training_args.train_batch_size,
-            drop_last=True,#多卡建议扔掉
+            drop_last=True,  # 多卡建议扔掉
             num_processes=trainer.world_size, process_index=trainer.global_rank,
             dataset_loader_filter_fn=dataset_loader_filter_fn,
             num_workers=0

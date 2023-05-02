@@ -13,12 +13,22 @@ from deep_training.nlp.models.moss.tokenization_moss import MossTokenizer
 from deep_training.nlp.models.lora.v2 import LoraArguments, LoraModel,LoraConfig
 from deep_training.nlp.models.prompt import PromptModel,PromptArguments,get_prompt_model,PromptLearningConfig
 from deep_training.nlp.models.transformer import TransformerBase
+from transformers import PreTrainedModel
 
 #如果显卡支持int8 可以开启 ， 需安装依赖 pip install bitsandbytes
 load_in_8bit = False
 
 #注意！！！ 非lora,非p-tuning 模式 ， <= config.json num_layers
 global_num_layers_freeze = -1
+
+
+def convert_tokens_to_string(self, tokens):
+    """Converts a sequence of tokens (string) in a single string."""
+    text = "".join([c for c in tokens if c is not None])
+    text = bytearray([self.byte_decoder[c] for c in text]).decode("utf-8", errors=self.errors)
+    return text
+
+MossTokenizer.convert_tokens_to_string = convert_tokens_to_string
 
 
 class DefaultParam:
@@ -83,7 +93,7 @@ class MyMossForCausalLM(MossForCausalLM):
         self.extra_param = DefaultParam()
 
     @torch.no_grad()
-    def chat(self,tokenizer, text: str, **kwargs):
+    def chat(self,tokenizer: MossTokenizer, text: str, **kwargs):
         self.extra_param.init_control(tokenizer)
         kwargs.update(self.extra_param.param)
         tokens = tokenizer.batch_encode_plus([self.extra_param.prefix + text], return_tensors="pt")
@@ -277,11 +287,11 @@ class MyTransformer(MyTransformerMossForCausalLM, with_pl=True):
             return [(self.backbone,lr)]
         return super(MyTransformer, self).get_model_lr(model,lr)
 
-    def get_llm_model(self) -> MyMossForCausalLM:
+    def get_llm_model(self) -> PreTrainedModel:
         if self.lora_args is not None and self.lora_args.with_lora:
-            return self.backbone.model.model
+            return self.backbone.model
         elif self.prompt_args is not None and self.prompt_args.with_prompt:
-            return self.backbone.model.model
+            return self.backbone.model
         return self.backbone.model
 
     def save_pretrained_merge_lora(self,weight_path_file: str):
@@ -291,7 +301,7 @@ class MyTransformer(MyTransformerMossForCausalLM, with_pl=True):
         lora_model : LoraModel = self.backbone
         model = lora_model.merge_and_unload()
         # 保存hf权重，可用infer.py推理
-        torch.save(model.model.state_dict(), weight_path_file)
+        torch.save(model.state_dict(), weight_path_file)
         return model
 
     def save_pretrained_merge_lora_and_restore(self, weight_path_file: str):
@@ -301,5 +311,5 @@ class MyTransformer(MyTransformerMossForCausalLM, with_pl=True):
         lora_model: LoraModel = self.backbone
         lora_model.merge_adapter()
         # 保存hf权重，可用infer.py推理
-        torch.save(lora_model.model.model.state_dict(), weight_path_file)
+        torch.save(lora_model.model.state_dict(), weight_path_file)
         lora_model.unmerge_adapter()

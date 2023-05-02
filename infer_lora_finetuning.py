@@ -4,16 +4,15 @@ import os
 
 from deep_training.data_helper import ModelArguments, TrainingArguments, DataArguments
 from deep_training.nlp.models.moss import MossConfig
-from deep_training.nlp.models.lora.v2 import LoraArguments
 from transformers import HfArgumentParser
 
 from data_utils import train_info_args, NN_DataHelper
-from models import MyTransformer, MossTokenizer, load_in_8bit
+from models import MyTransformer, MossTokenizer, load_in_8bit,LoraArguments,PromptArguments
 
 if __name__ == '__main__':
     train_info_args['seed'] = None
-    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments))
-    model_args, training_args, data_args, _ = parser.parse_dict(train_info_args)
+    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments,PromptArguments))
+    model_args, training_args, data_args, _,_ = parser.parse_dict(train_info_args)
 
     
 
@@ -30,7 +29,7 @@ if __name__ == '__main__':
 
     pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args)
     # 加载lora权重
-    pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_dir, lora_config = lora_args)
+    pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_dir, lora_config =lora_args)
     if load_in_8bit:
         pl_model.eval().cuda()
     else:

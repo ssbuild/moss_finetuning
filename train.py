@@ -3,7 +3,6 @@ import logging
 import os
 import torch
 from deep_training.data_helper import ModelArguments, DataArguments, TrainingArguments
-from deep_training.nlp.models.lora.v2 import LoraArguments
 from deep_training.utils.trainer import ModelCheckpoint, SimpleModelCheckpoint
 from lightning import Trainer
 from lightning.pytorch.callbacks import LearningRateMonitor
@@ -11,14 +10,15 @@ from lightning.pytorch.strategies import DeepSpeedStrategy
 from transformers import HfArgumentParser
 
 from data_utils import NN_DataHelper, train_info_args, get_deepspeed_config
-from models import MyTransformer,MossTokenizer,MossConfig
+from models import MyTransformer,MossTokenizer,MossConfig,LoraArguments,PromptArguments
 
 
 class MySimpleModelCheckpoint(SimpleModelCheckpoint):
     def __init__(self, *args, **kwargs):
         super(MySimpleModelCheckpoint, self).__init__(*args, **kwargs)
         lora_args: LoraArguments = self.external_kwargs['lora_args']
-        if lora_args:
+        prompt_args = self.external_kwargs['prompt_args']
+        if lora_args or prompt_args:
             self.weight_file = './best_ckpt'
             self.last_weight_file = './last_ckpt'
 
@@ -41,8 +41,9 @@ class MySimpleModelCheckpoint(SimpleModelCheckpoint):
     ) -> None:
 
         lora_args : LoraArguments =  self.external_kwargs['lora_args']
+        prompt_args = self.external_kwargs['prompt_args']
         # 保存权重
-        if lora_args is None:
+        if lora_args is None and prompt_args is None:
             super(MySimpleModelCheckpoint, self).on_save_model(trainer, pl_module)
         else:
             #保存最新权重
@@ -68,15 +69,16 @@ class MySimpleModelCheckpoint(SimpleModelCheckpoint):
 
             
 if __name__ == '__main__':
-    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments))
-    model_args, training_args, data_args, lora_args = parser.parse_dict(train_info_args)
+    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments,PromptArguments))
+    model_args, training_args, data_args, lora_args,prompt_args = parser.parse_dict(train_info_args)
     lora_args = lora_args.config
+    prompt_args = prompt_args.config
     #
     
     deepspeed_config = get_deepspeed_config()
 
     # 保存最小loss模型
-    if lora_args:
+    if lora_args or prompt_args:
         assert deepspeed_config is None,ValueError('lora mode does not support deepspeed')
         checkpoint_callback = MySimpleModelCheckpoint(
                               # monitor="loss",
@@ -86,7 +88,8 @@ if __name__ == '__main__':
                               #模型参数
                               model_args=model_args,
                               training_args=training_args,
-                              lora_args=lora_args,)
+                              lora_args=lora_args,
+                              prompt_args=prompt_args)
     else:
         checkpoint_callback = ModelCheckpoint('./best_ckpt',
                                               # monitor='loss',
@@ -122,7 +125,7 @@ if __name__ == '__main__':
 
     tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,config_class_name=MossConfig)
     config.torch_dtype = "float16"
-    # config.n_layer = 1
+
     # 额外参数
     checkpoint_callback.tokenizer = tokenizer
     checkpoint_callback.data_args = data_args
@@ -138,23 +141,31 @@ if __name__ == '__main__':
         dataHelper.make_dataset_with_args(data_args.test_file,mode='test')
 
 
-    pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args)
+    pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args,prompt_args=prompt_args)
     pl_model.half()
 
     ckpt_path = './best_ckpt/best.pt'
     if not data_args.convert_onnx:
-        # #  只恢复权重 ， 不恢复步数和优化器 ，
-        # #  如果想恢复步数， 修改 trainer.fit(pl_model, train_dataloaders=train_datasets，ckpt=ckpt_path)  注lora 当前不支持恢复步数。
+        #  只恢复权重 ， 不恢复步数和优化器 ，
+        #  如果想恢复步数， 修改 trainer.fit(pl_model, train_dataloaders=train_datasets，ckpt=ckpt_path)  注lora 当前不支持恢复步数。
         # if os.path.exists(ckpt_path):
-        #     if lora_args is None:
-        #         # 加载权重继续训练
-        #         pl_model = MyTransformer.load_from_checkpoint(ckpt_path, config=config,model_args=model_args,training_args=training_args,lora_args=lora_args,strict=False)
-        #     else:
+        #     if lora_args is not None:
         #         # 加载lora权重 继续训练  0.0.20版本支持lora 继续训练
-        #         pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,lora_config=lora_args,is_trainable=True,strict=False)
+        #         pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,
+        #                                           lora_config=lora_args, is_trainable=True, strict=False)
+        #     elif prompt_args is not None:
+        #         raise ValueError('prompt is not support continue training')
+        #         # pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,
+        #         #                                   lora_config=lora_args, is_trainable=True, strict=False)
+        #     else:
+        #         # 加载权重继续训练
+        #         pl_model = MyTransformer.load_from_checkpoint(ckpt_path, config=config, model_args=model_args,
+        #                                                       training_args=training_args, lora_args=lora_args,
+        #                                                       prompt_args=prompt_args, strict=False)
+
 
         def dataset_loader_filter_fn(dataset):
-            print('*' * 30, 'total', len(dataset))
+            print('*' * 30, 'total count', len(dataset))
             return dataset
 
 
@@ -179,22 +190,6 @@ if __name__ == '__main__':
                                                        model_args=model_args,
                                                        training_args=training_args,
                                                        lora_args=lora_args,strict=False)
-            # input_sample = (
-            #     ("input_ids", torch.ones(size=(1, 128), dtype=torch.int32)),
-            #     ("attention_mask", torch.ones(size=(1, 1,128,128), dtype=torch.int32)),
-            #     ("position_ids", torch.ones(size=(1, 2, 128), dtype=torch.int32)),
-            # )
-            # input_names = ("input_ids",'attention_mask','position_ids')
-            # output_names = ("pred_ids",)
-            # dynamic_axes = None or {"input_ids": [0, 1],
-            #                         "attention_mask": [0, 0,1,1],
-            #                         "position_ids": [0, 0,1],
-            #                         "pred_ids": [0, 1]}
-            # pl_module.convert_to_onnx('./best_ckpt/best.onnx',
-            #                       input_sample=input_sample,
-            #                       input_names=input_names,
-            #                       output_names=output_names,
-            #                       dynamic_axes=dynamic_axes)
 
             model = pl_model.get_llm_model()
             #保存huggingface model

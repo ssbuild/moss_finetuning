@@ -6,11 +6,10 @@ from collections import OrderedDict
 
 import torch
 from deep_training.data_helper import ModelArguments, TrainingArguments, DataArguments
-from deep_training.nlp.models.lora.v2 import LoraArguments
 from transformers import HfArgumentParser
 
 from data_utils import train_info_args, NN_DataHelper, get_deepspeed_config
-from models import MyTransformer,MossTokenizer,MossConfig
+from models import MyTransformer,MossTokenizer,MossConfig,LoraArguments,PromptArguments
 
 deep_config = get_deepspeed_config()
 
@@ -19,8 +18,8 @@ if __name__ == '__main__':
     train_info_args['seed'] = None
     train_info_args['model_name_or_path'] = None
 
-    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments))
-    model_args, training_args, data_args, _ = parser.parse_dict(train_info_args)
+    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments,PromptArguments))
+    model_args, training_args, data_args, _,_ = parser.parse_dict(train_info_args)
 
     
 

@@ -1,4 +1,5 @@
 ##  
+    5月02日 增加p-tuning-v2
     4月28日 deep_training 0.1.3 pytorch-lightning 改名 ligntning ，旧版本 deep_training <= 0.1.2
     4月23日 增加lora merge权重（修改infer_lora_finetuning.py enable_merge_weight 选项）
 

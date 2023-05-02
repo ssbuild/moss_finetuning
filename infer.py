@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/3/9 15:29
 from deep_training.data_helper import ModelArguments, TrainingArguments, DataArguments
-from deep_training.nlp.models.lora.v2 import LoraArguments
 from transformers import HfArgumentParser
 
 from data_utils import train_info_args, NN_DataHelper
-from models import MyTransformer,MossConfig,MossTokenizer
+from models import MyTransformer,MossConfig,MossTokenizer,LoraArguments,PromptArguments
 
 if __name__ == '__main__':
     train_info_args['seed'] = None
-    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments))
-    model_args, training_args, data_args, _ = parser.parse_dict(train_info_args)
+    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments,PromptArguments))
+    model_args, training_args, data_args, _,_ = parser.parse_dict(train_info_args)
 
     dataHelper = NN_DataHelper(model_args, training_args, data_args)
     tokenizer: MossConfig

@@ -12,11 +12,10 @@ from enum import Enum
 import numpy as np
 import torch
 from deep_training.data_helper import DataHelper, ModelArguments, TrainingArguments, DataArguments
-from deep_training.nlp.models.lora.v2 import LoraArguments
 from fastdatasets.record import load_dataset as Loader, RECORD, WriterObject, gfile
 from tqdm import tqdm
 from transformers import HfArgumentParser,PreTrainedTokenizer
-from models import MyTransformer,MossConfig,MossTokenizer
+from models import MyTransformer,MossConfig,MossTokenizer,LoraArguments,PromptArguments
 
 from data_processer import DataStrategy, TokenSupervision, TokenUnSupervision, TokenSupervisionRounds, \
     TokenRoundsForMoss
@@ -54,12 +53,26 @@ adalora_info_args = {
     'rank_pattern': None, #The saved rank pattern.
 }
 
+prompt_info_args = {
+    "with_prompt": False,
+    "prompt_type": "prefix_tuning", # one of prompt_tuning,p_tuning,prefix_tuning,adaption_prompt
+    "task_type": "causal_lm", #  one of seq_cls,seq_2_seq_lm,causal_lm,token_cls
+    "prefix_projection": False, # Whether to project the prefix tokens"
+    "num_virtual_tokens": 16, # Number of virtual tokens
+    # "token_dim": 2048, # The hidden embedding dimension of the base transformer model.
+    # "num_transformer_submodules": 1, # The number of transformer submodules in the base transformer model.
+    # "num_attention_heads" : 24, # The number of attention heads in the base transformer model.
+    # "num_layers": 1, # The number of layers in the base transformer model.
+    # "encoder_hidden_size": 2048, # The hidden size of the encoder
+    # "prefix_projection": False # Whether to project the prefix tokens"
+}
+
 train_info_args = {
     'devices': 1,
     'data_backend': 'record',  #one of record lmdb, 超大数据集可以使用 lmdb , 注 lmdb 存储空间比record大
     'model_type': 'moss',
     # 预训练模型路径 , 从0训练，则置空
-    'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft',
+    #'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft',
     'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft/config.json',
     'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft',
 
@@ -117,6 +130,7 @@ train_info_args = {
     #注意lora,adalora 和 ptuning-v2 禁止同时使用
    'lora': {**lora_info_args},
    'adalora': {**adalora_info_args},
+   'prompt': {**prompt_info_args}
 }
 
 #lora 模式暂时不支持deepspeed
@@ -252,9 +266,8 @@ class NN_DataHelper(DataHelper):
 
 
 if __name__ == '__main__':
-    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments))
-    model_args, training_args, data_args, lora_args = parser.parse_dict(train_info_args)
-    lora_args = lora_args.config
+    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments,PromptArguments))
+    model_args, training_args, data_args, _,_ = parser.parse_dict(train_info_args)
 
     dataHelper = NN_DataHelper(model_args, training_args, data_args)
     tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,config_class_name=MossConfig)

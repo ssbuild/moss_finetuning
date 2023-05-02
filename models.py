@@ -289,7 +289,7 @@ class MyTransformer(MyTransformerMossForCausalLM, with_pl=True):
 
     def get_llm_model(self) -> PreTrainedModel:
         if self.lora_args is not None and self.lora_args.with_lora:
-            return self.backbone.model
+            return self.backbone.model.model
         elif self.prompt_args is not None and self.prompt_args.with_prompt:
             return self.backbone.model
         return self.backbone.model
@@ -301,7 +301,7 @@ class MyTransformer(MyTransformerMossForCausalLM, with_pl=True):
         lora_model : LoraModel = self.backbone
         model = lora_model.merge_and_unload()
         # 保存hf权重，可用infer.py推理
-        torch.save(model.state_dict(), weight_path_file)
+        torch.save(model.model.state_dict(), weight_path_file)
         return model
 
     def save_pretrained_merge_lora_and_restore(self, weight_path_file: str):
@@ -311,5 +311,5 @@ class MyTransformer(MyTransformerMossForCausalLM, with_pl=True):
         lora_model: LoraModel = self.backbone
         lora_model.merge_adapter()
         # 保存hf权重，可用infer.py推理
-        torch.save(lora_model.model.state_dict(), weight_path_file)
+        torch.save(lora_model.model.model.state_dict(), weight_path_file)
         lora_model.unmerge_adapter()

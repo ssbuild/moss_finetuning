@@ -17,7 +17,7 @@
 * 用户为  lk ， 密码是 password@lk
 * lk 可以 sudo
 * 用户lk 的 id 和 组 id 都 为 8001 
-* 建议在 host 中 ， 新建一个 id 为 8001 （名字任意）的 用户 ， 在这个 环境下 使用 docker ，以 解决 文件访问 权限 问题 。
+* 建议在 host 中 ， 新建一个 id 为 8001 的 用户 ， 在这个新用户 环境下 使用 docker ，以 解决 文件访问 权限 问题 。
 * 新建用户和组的 命令 类似下面 ， 请 自行修改
 ```
 groupadd -g 8001  lk && useradd -u 8001 -r -g lk lk 

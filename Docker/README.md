@@ -24,7 +24,9 @@ groupadd -g 8001  lk && useradd -u 8001 -r -g lk lk
 ```
 * 将用户 加入 docker 组 ， 该用户就可以使用 docker 了 ， 无需 sudo 。
 
-### 构建镜像命令 ， 其中 t 参数 指定 在 docker 中的镜像名 ， f 参数 ， 指定 dockerfile ， 请自行 修改 。 注意命令最后的 .  是当前目录的意思 。
+### 构建镜像命令 
+
+其中 t 参数 指定 在 docker 中的镜像名 ， f 参数 ， 指定 dockerfile ， 请自行 修改 。 注意命令最后的 .  是当前目录的意思 。
 
 ```
 docker build -t  dev-moss  -f  ./Dockerfile   .

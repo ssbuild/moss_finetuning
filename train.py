@@ -10,7 +10,7 @@ from lightning.pytorch.strategies import DeepSpeedStrategy
 from transformers import HfArgumentParser
 
 from data_utils import NN_DataHelper, train_info_args, get_deepspeed_config
-from models import MyTransformer,MossTokenizer,MossConfig,LoraArguments,PromptArguments
+from models import MyTransformer,MossTokenizer,MossConfig,LoraArguments,PromptArguments,load_in_8bit
 
 
 class MySimpleModelCheckpoint(SimpleModelCheckpoint):
@@ -142,7 +142,8 @@ if __name__ == '__main__':
 
 
     pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args,prompt_args=prompt_args)
-    pl_model.half()
+    if not load_in_8bit:
+        pl_model.half()
 
     ckpt_path = './best_ckpt/best.pt'
     if not data_args.convert_onnx:

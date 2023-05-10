@@ -247,7 +247,7 @@ class MyTransformerMossForCausalLM(TransformerBase):
             kwargs.update({"load_in_8bit": True,"device_map": "auto"})
         super(MyTransformerMossForCausalLM, self).__init__(*args,**kwargs)
         self.set_model(self.from_pretrained(MyMossForCausalLM, *args, **kwargs))
-        self.model.enable_input_require_grads()
+        # self.model.enable_input_require_grads()
 
 
 

@@ -74,6 +74,7 @@
     支持以下微调方式 
 - 冻结 N 层 修改models.py global_num_layers_freeze    
 - lora
+- ptv2
 - 正常微调
 ```text
     python train.py
@@ -91,6 +92,8 @@ MASTER_ADDR=10.0.0.1 MASTER_PORT=6667 WORLD_SIZE=12 NODE_RANK=2 python train.py
 ### 是否开启lora finetuning
     with_lora
 
+### ptv2
+   with_prompt
 
 ### int高效训练方式
    lora int8  修改modes.py load_in_8bit = True  修改data_utils.py 对应with_lora=True 

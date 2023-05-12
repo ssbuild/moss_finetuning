@@ -3,24 +3,16 @@
     4月28日 deep_training 0.1.3 pytorch-lightning 改名 ligntning ，旧版本 deep_training <= 0.1.2
     4月23日 增加lora merge权重（修改infer_lora_finetuning.py enable_merge_weight 选项）
 
-## 1.安装
+## install 
   - pip install -i https://pypi.org/simple -U deep_training>=0.1.3 deepspeed
   - pip install triton #如果推理量化模
 
-## 2.更新详情
+## update information
 - [deep_training](https://github.com/ssbuild/deep_training)
 
-## 3.深度学习常规任务例子
-
-- [pytorch-task-example](https://github.com/ssbuild/pytorch-task-example)
-- [tf-task-example](https://github.com/ssbuild/tf-task-example)
-- [llm_finetuning](https://github.com/ssbuild/llm_finetuning)
-- [llm_rlhf_finetuning](https://github.com/ssbuild/llm_rlhf_finetuning)
-- [chatglm_rlhf_finetuning](https://github.com/ssbuild/chatglm_rlhf_finetuning)
 
 
-
-## 4.预训练权重
+## weight
 
 - [moss-moon-003-base](https://huggingface.co/fnlp/moss-moon-003-base): MOSS-003基座模型，在高质量中英文语料上自监督预训练得到，预训练语料包含约700B单词，计算量约6.67x10<sup>22</sup>次浮点数运算。
 - [moss-moon-003-sft](https://huggingface.co/fnlp/moss-moon-003-sft): 基座模型在约110万多轮对话数据上微调得到，具有指令遵循能力、多轮对话能力、规避有害请求能力。
@@ -30,7 +22,7 @@
 - [moss-moon-003-sft-plugin-int4](https://huggingface.co/fnlp/moss-moon-003-sft-plugin-int4): 4bit量化版本的`moss-moon-003-sft-plugin`模型，约占用12GB显存即可进行推
     
 
-## 5.数据示例
+## data sample
     数据示例如下:
 ```json
 {
@@ -54,7 +46,7 @@
 
 
 
-## 6.生成训练record
+## generate record
 
     python data_utils.py
     
@@ -63,14 +55,14 @@
     dataHelper.make_dataset_with_args(data_args.train_file,mixed_data=False, shuffle=True,mode='train',num_process_worker=0)
 
 
-## 7.推理
+## infer
     # infer.py 推理预训练模型
     # infer_finetuning.py 推理微调模型
     # infer_lora_finetuning.py 推理lora微调模型
      python infer.py
 
 
-## 8.训练
+## finetuning
     支持以下微调方式 
 - 冻结 N 层 修改models.py global_num_layers_freeze    
 - lora
@@ -89,7 +81,7 @@ MASTER_ADDR=10.0.0.1 MASTER_PORT=6667 WORLD_SIZE=12 NODE_RANK=2 python train.py
 ```
 
 
-### 是否开启lora finetuning
+### lora finetuning
     with_lora
 
 ### ptv2
@@ -99,11 +91,26 @@ MASTER_ADDR=10.0.0.1 MASTER_PORT=6667 WORLD_SIZE=12 NODE_RANK=2 python train.py
    lora int8  修改modes.py load_in_8bit = True  修改data_utils.py 对应with_lora=True 
    注意 lora int8 多卡训练  CUDA_VISIBLE_DEVICES=显卡数量 和 data_utils.py devices 保持一致，否则容易出故障 ， 建议使用 CUDA_VISIBLE_DEVICES=显卡数量 python train.py
 
-## 9.是否开启deepspeed
+## deepspeed
     启动则将data_utils.py  修改 enable_deepspeed 
     lora 模式暂时不支持deepspeed
 
 
 
-## 10. Reference
+## Reference
     https://huggingface.co/fnlp
+
+## 友情链接
+
+- [pytorch-task-example](https://github.com/ssbuild/pytorch-task-example)
+- [tf-task-example](https://github.com/ssbuild/tf-task-example)
+- [chatmoss_finetuning](https://github.com/ssbuild/chatmoss_finetuning)
+- [chatglm_finetuning](https://github.com/ssbuild/chatglm_finetuning)
+- [chatyuan_finetuning](https://github.com/ssbuild/chatyuan_finetuning)
+- [llm_finetuning](https://github.com/ssbuild/llm_finetuning)
+- [rlhf_llm](https://github.com/ssbuild/rlhf_llm)
+- [rlhf_chatglm](https://github.com/ssbuild/rlhf_chatglm)
+- [rlhf_chatyuan](https://github.com/ssbuild/rlhf_chatyuan)
+
+## 
+    纯粹而干净的代码

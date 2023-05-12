@@ -1,15 +1,17 @@
-##  
-    5月02日 增加p-tuning-v2
-    4月28日 deep_training 0.1.3 pytorch-lightning 改名 ligntning ，旧版本 deep_training <= 0.1.2
-    4月23日 增加lora merge权重（修改infer_lora_finetuning.py enable_merge_weight 选项）
-
-## install 
-  - pip install -i https://pypi.org/simple -U deep_training>=0.1.3 deepspeed
-  - pip install triton #如果推理量化模
-
 ## update information
 - [deep_training](https://github.com/ssbuild/deep_training)
 
+```text
+    05-12 fix lora int8 多卡训练 
+    05-02 增加p-tuning-v2
+    04-28 deep_training 0.1.3 pytorch-lightning 改名 ligntning ，旧版本 deep_training <= 0.1.2
+    04-23 增加lora merge权重（修改infer_lora_finetuning.py enable_merge_weight 选项）
+```
+   
+
+## install 
+  - pip install -i https://pypi.org/simple -U deep_training>=0.1.5 deepspeed
+  - pip install triton #如果推理量化模
 
 
 ## weight
@@ -88,8 +90,7 @@ MASTER_ADDR=10.0.0.1 MASTER_PORT=6667 WORLD_SIZE=12 NODE_RANK=2 python train.py
    with_prompt
 
 ### int高效训练方式
-   lora int8  修改modes.py load_in_8bit = True  修改data_utils.py 对应with_lora=True 
-   注意 lora int8 多卡训练  CUDA_VISIBLE_DEVICES=显卡数量 和 data_utils.py devices 保持一致，否则容易出故障 ， 建议使用 CUDA_VISIBLE_DEVICES=显卡数量 python train.py
+   lora int8  修改modes.py load_in_8bit = True  修改data_utils.py 对应with_lora=True
 
 ## deepspeed
     启动则将data_utils.py  修改 enable_deepspeed 

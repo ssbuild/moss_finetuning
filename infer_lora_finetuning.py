@@ -18,8 +18,7 @@ if __name__ == '__main__':
 
     dataHelper = NN_DataHelper(model_args, training_args, data_args)
     tokenizer: MossTokenizer
-    tokenizer, _, _, _ = dataHelper.load_tokenizer_and_config(
-        tokenizer_class_name=MossTokenizer, config_class_name=MossConfig)
+    tokenizer, _, _, _ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer, config_class_name=MossConfig,config_kwargs={"torch_dtype": "float16"})
 
     ckpt_dir = './best_ckpt'
     config = MossConfig.from_pretrained(ckpt_dir)

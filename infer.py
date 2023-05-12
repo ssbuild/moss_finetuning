@@ -13,10 +13,7 @@ if __name__ == '__main__':
 
     dataHelper = NN_DataHelper(model_args, training_args, data_args)
     tokenizer: MossConfig
-    tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(
-        tokenizer_class_name=MossTokenizer, config_class_name=MossConfig)
-    config.torch_dtype = "float16"
-    # config.n_layer = 1
+    tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer, config_class_name=MossConfig,config_kwargs={"torch_dtype": "float16"})
 
     pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args)
     model = pl_model.get_llm_model()

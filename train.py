@@ -122,9 +122,7 @@ if __name__ == '__main__':
     )
 
     dataHelper = NN_DataHelper(model_args, training_args, data_args)
-
-    tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,config_class_name=MossConfig)
-    config.torch_dtype = "float16"
+    tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,config_class_name=MossConfig,config_kwargs={"torch_dtype": "float16"})
 
     # 额外参数
     checkpoint_callback.tokenizer = tokenizer
@@ -141,7 +139,8 @@ if __name__ == '__main__':
         dataHelper.make_dataset_with_args(data_args.test_file,mode='test')
 
 
-    pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args,prompt_args=prompt_args)
+    pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args,prompt_args=prompt_args,
+                             load_in_8bit=load_in_8bit, device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto")
     if not load_in_8bit:
         pl_model.half()
 
@@ -152,8 +151,8 @@ if __name__ == '__main__':
         # if os.path.exists(ckpt_path):
         #     if lora_args is not None:
         #         # 加载lora权重 继续训练  0.0.20版本支持lora 继续训练
-        #         pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,
-        #                                           lora_config=lora_args, is_trainable=True, strict=False)
+        #         pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,lora_config=lora_args, is_trainable=True,
+        #                                           load_in_8bit=load_in_8bit, device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto",strict=False)
         #     elif prompt_args is not None:
         #         raise ValueError('prompt is not support continue training')
         #         # pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,

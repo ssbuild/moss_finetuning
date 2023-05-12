@@ -25,8 +25,7 @@ if __name__ == '__main__':
 
     dataHelper = NN_DataHelper(model_args, training_args, data_args)
     tokenizer: MossTokenizer
-    tokenizer, _, _, _ = dataHelper.load_tokenizer_and_config(
-        tokenizer_class_name=MossTokenizer, config_class_name=MossConfig)
+    tokenizer, _, _, _ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer, config_class_name=MossConfig,config_kwargs={"torch_dtype": "float16"})
     ###################### 注意 选最新权重
     #选择最新的权重 ， 根据时间排序 选最新的
     config = MossConfig.from_pretrained('./best_ckpt')

@@ -142,6 +142,7 @@ if __name__ == '__main__':
     pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args,prompt_args=prompt_args,
                              load_in_8bit=load_in_8bit, device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto")
     if not load_in_8bit:
+        # pl_model.bfloat16()
         pl_model.half()
 
     ckpt_path = './best_ckpt/best.pt'

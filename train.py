@@ -145,64 +145,39 @@ if __name__ == '__main__':
         # pl_model.bfloat16()
         pl_model.half()
 
-    ckpt_path = './best_ckpt/best.pt'
-    if not data_args.convert_onnx:
-        #  只恢复权重 ， 不恢复步数和优化器 ，
-        #  如果想恢复步数， 修改 trainer.fit(pl_model, train_dataloaders=train_datasets，ckpt=ckpt_path)  注lora 当前不支持恢复步数。
-        # if os.path.exists(ckpt_path):
-        #     if lora_args is not None:
-        #         # 加载lora权重 继续训练  0.0.20版本支持lora 继续训练
-        #         pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,lora_config=lora_args, is_trainable=True,
-        #                                           load_in_8bit=load_in_8bit, device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto",strict=False)
-        #     elif prompt_args is not None:
-        #         raise ValueError('prompt is not support continue training')
-        #         # pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,
-        #         #                                   lora_config=lora_args, is_trainable=True, strict=False)
-        #     else:
-        #         # 加载权重继续训练
-        #         pl_model = MyTransformer.load_from_checkpoint(ckpt_path, config=config, model_args=model_args,
-        #                                                       training_args=training_args, lora_args=lora_args,
-        #                                                       prompt_args=prompt_args, strict=False)
+
+    #  只恢复权重 ， 不恢复步数和优化器 ，
+    #  如果想恢复步数， 修改 trainer.fit(pl_model, train_dataloaders=train_datasets，ckpt=ckpt_path)  注lora 当前不支持恢复步数。
+    # if os.path.exists(ckpt_path):
+    #     if lora_args is not None:
+    #         # 加载lora权重 继续训练  0.0.20版本支持lora 继续训练
+    #         pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,lora_config=lora_args, is_trainable=True,
+    #                                           load_in_8bit=load_in_8bit, device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto",strict=False)
+    #     elif prompt_args is not None:
+    #         raise ValueError('prompt is not support continue training')
+    #         # pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,
+    #         #                                   lora_config=lora_args, is_trainable=True, strict=False)
+    #     else:
+    #         # 加载权重继续训练
+    #         pl_model = MyTransformer.load_from_checkpoint(ckpt_path, config=config, model_args=model_args,
+    #                                                       training_args=training_args, lora_args=lora_args,
+    #                                                       prompt_args=prompt_args, strict=False)
+
+    def dataset_loader_filter_fn(dataset):
+        print('*' * 30, 'total count', len(dataset))
+        return dataset
 
 
-        def dataset_loader_filter_fn(dataset):
-            print('*' * 30, 'total count', len(dataset))
-            return dataset
+    train_datasets = dataHelper.load_distributed_random_sampler(
+        dataHelper.train_files,
+        with_load_memory=data_args.data_backend == 'record',
+        collate_fn=dataHelper.collate_fn,
+        batch_size=training_args.train_batch_size,
+        drop_last=True,  # 多卡建议扔掉
+        num_processes=trainer.world_size, process_index=trainer.global_rank,
+        dataset_loader_filter_fn=dataset_loader_filter_fn,
+        num_workers=0
+    )
 
-
-        train_datasets = dataHelper.load_distributed_random_sampler(
-            dataHelper.train_files,
-            with_load_memory=data_args.data_backend == 'record',
-            collate_fn=dataHelper.collate_fn,
-            batch_size=training_args.train_batch_size,
-            drop_last=True,  # 多卡建议扔掉
-            num_processes=trainer.world_size, process_index=trainer.global_rank,
-            dataset_loader_filter_fn=dataset_loader_filter_fn,
-            num_workers=0
-        )
-
-        if train_datasets is not None:
-            trainer.fit(pl_model, train_dataloaders=train_datasets)
-
-    else:
-        if lora_args is not None:
-            # 加载权重
-            pl_model = MyTransformer.load_from_checkpoint(ckpt_path, config=config,
-                                                       model_args=model_args,
-                                                       training_args=training_args,
-                                                       lora_args=lora_args,strict=False)
-
-            model = pl_model.get_llm_model()
-            #保存huggingface model
-            model.save_pretrained('huggingface_model',max_shard_size='10GB')
-        else:
-            # 加载权重
-            lora_args = LoraArguments.from_pretrained('./best_ckpt')
-            pl_module = MyTransformer(lora_args=lora_args,
-                                      config=config,
-                                      model_args=model_args,
-                                      training_args=training_args)
-            # 二次加载权重
-            pl_module.backbone.from_pretrained(pl_module.backbone.model, pretrained_model_name_or_path='./best_ckpt',lora_config=lora_args)
-
-            model = pl_model.get_llm_model()
+    if train_datasets is not None:
+        trainer.fit(pl_model, train_dataloaders=train_datasets)

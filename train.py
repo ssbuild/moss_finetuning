@@ -9,8 +9,9 @@ from lightning.pytorch.callbacks import LearningRateMonitor
 from lightning.pytorch.strategies import DeepSpeedStrategy
 from transformers import HfArgumentParser
 
+from config import global_args
 from data_utils import NN_DataHelper, train_info_args, get_deepspeed_config
-from models import MyTransformer,MossTokenizer,MossConfig,LoraArguments,PromptArguments,load_in_8bit
+from models import MyTransformer,MossTokenizer,MossConfig,LoraArguments,PromptArguments
 
 
 class MySimpleModelCheckpoint(SimpleModelCheckpoint):
@@ -118,8 +119,8 @@ if __name__ == '__main__':
         accumulate_grad_batches=training_args.gradient_accumulation_steps,
         num_sanity_val_steps=0,
         strategy=strategy,
-        precision='16'  # #可以自行尝试  "32": "32-true", "16": "16-mixed", "bf16": "bf16-mixed"
-        # precision=16,#半精度
+        # lora int8 precision='32'
+        precision='32' if global_args['load_in_8bit'] else '16',# 可以自行尝试  "32": "32-true", "16": "16-mixed", "bf16": "bf16-mixed"
     )
 
     dataHelper = NN_DataHelper(model_args, training_args, data_args)
@@ -141,7 +142,7 @@ if __name__ == '__main__':
 
 
     pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args,prompt_args=prompt_args,
-                             load_in_8bit=load_in_8bit, device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto")
+                             load_in_8bit=global_args['load_in_8bit'], device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto")
 
     pl_model.float()
 

@@ -5,11 +5,11 @@ import re
 from collections import OrderedDict
 
 import torch
-from deep_training.data_helper import ModelArguments, TrainingArguments, DataArguments
+from deep_training.data_helper import ModelArguments, DataArguments
 from transformers import HfArgumentParser
 
 from data_utils import train_info_args, NN_DataHelper, get_deepspeed_config
-from models import MyTransformer,MossTokenizer,MossConfig,LoraArguments,PromptArguments
+from models import MyTransformer,MossTokenizer,MossConfig
 
 deep_config = get_deepspeed_config()
 
@@ -18,12 +18,11 @@ if __name__ == '__main__':
     train_info_args['seed'] = None
     train_info_args['model_name_or_path'] = None
 
-    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments,PromptArguments))
-    model_args, training_args, data_args, _,_ = parser.parse_dict(train_info_args)
-
+    parser = HfArgumentParser((ModelArguments, DataArguments,))
+    model_args, data_args, _, _ = parser.parse_dict(train_info_args, allow_extra_keys=True)
     
 
-    dataHelper = NN_DataHelper(model_args, training_args, data_args)
+    dataHelper = NN_DataHelper(model_args, None, data_args)
     tokenizer: MossTokenizer
     tokenizer, _, _, _ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer, config_class_name=MossConfig,config_kwargs={"torch_dtype": "float16"})
     ###################### 注意 选最新权重
@@ -35,8 +34,7 @@ if __name__ == '__main__':
     if deep_config is None:
         train_weight = './best_ckpt/last-v3.ckpt'
         assert os.path.exists(train_weight)
-        pl_model = MyTransformer.load_from_checkpoint(train_weight, config=config,model_args=model_args,
-                                                   training_args=training_args,strict=False)
+        pl_model = MyTransformer.load_from_checkpoint(train_weight, config=config,model_args=model_args,strict=False)
     else:
 
         #建议直接使用转换脚本命令 支持 deepspeed stage 0,1,2,3， 生成 ./best_ckpt/last.ckpt/best.pt 权重文件
@@ -52,7 +50,7 @@ if __name__ == '__main__':
         weights_dict_new = OrderedDict()
         for k,v in (weights_dict['module'] if 'module' in weights_dict else weights_dict).items():
             weights_dict_new[re.sub(r'_forward_module\.', '', k)] = v
-        pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args)
+        pl_model = MyTransformer(config=config, model_args=model_args)
         pl_model.load_state_dict(state_dict= weights_dict_new, strict=False)
 
     model = pl_model.get_llm_model()

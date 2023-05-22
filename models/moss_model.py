@@ -18,11 +18,6 @@ from deep_training.nlp.models.prompt import PromptModel,PromptArguments,get_prom
 from deep_training.nlp.models.transformer import TransformerBase
 from transformers import PreTrainedModel
 
-#如果显卡支持int8 可以开启 ， 需安装依赖 pip install bitsandbytes
-load_in_8bit = False
-
-#注意！！！ 非lora,非p-tuning 模式 ， <= config.json num_layers
-global_num_layers_freeze = -1
 
 
 def convert_tokens_to_string(self, tokens):

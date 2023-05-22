@@ -4,6 +4,11 @@
 import json
 import os
 
+global_args = {
+    "load_in_8bit": False, # lora 如果显卡支持int8 可以开启 ， 需安装依赖 pip install bitsandbytes
+}
+
+
 lora_info_args = {
     'with_lora': True,  # 是否启用lora模块
     'r': 8,

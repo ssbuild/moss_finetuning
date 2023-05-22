@@ -6,12 +6,12 @@ from deep_training.data_helper import ModelArguments, TrainingArguments, DataArg
 from deep_training.nlp.models.moss import MossConfig
 from transformers import HfArgumentParser
 
-from data_utils import train_info_args, NN_DataHelper
-from models import MyTransformer, MossTokenizer, load_in_8bit,LoraArguments,PromptArguments
+from data_utils import train_info_args, NN_DataHelper,global_args
+from models import MyTransformer, MossTokenizer,LoraArguments,PromptArguments
 
 if __name__ == '__main__':
     train_info_args['seed'] = None
-    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments,PromptArguments))
+    parser = HfArgumentParser((ModelArguments, DataArguments))
     model_args, training_args, data_args, _,_ = parser.parse_dict(train_info_args)
 
     

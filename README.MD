@@ -10,7 +10,7 @@
    
 
 ## install 
-  - pip install -i https://pypi.org/simple -U deep_training>=0.1.5 deepspeed
+  - pip install -i https://pypi.org/simple -U deep_training>=0.1.7 deepspeed
   - pip install triton #如果推理量化模
 
 

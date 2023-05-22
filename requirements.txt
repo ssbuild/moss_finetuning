@@ -1,2 +1,2 @@
-deep_training==0.1.5
+deep_training==0.1.7
 transformers>=4.28

@@ -6,6 +6,7 @@ import os
 
 global_args = {
     "load_in_8bit": False, # lora 如果显卡支持int8 可以开启 ， 需安装依赖 pip install bitsandbytes
+     "num_layers_freeze": -1, # 非lora,非p-tuning 模式 ， <= config.json num_layers
 }
 
 

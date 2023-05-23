@@ -2,7 +2,7 @@
 # @Author  : tk
 
 from models.moss_model import *
-
+from config import global_args
 
 class MyTransformer(MyTransformerMossForCausalLM, with_pl=True):
     def __init__(self, *args, **kwargs):
@@ -24,13 +24,13 @@ class MyTransformer(MyTransformerMossForCausalLM, with_pl=True):
             print('*' * 30, 'prompt info')
             model.print_trainable_parameters()
             self.set_model(model, copy_attr=False)
-        elif global_num_layers_freeze > 0 :  # 非 lora freeze
+        elif global_args['num_layers_freeze'] > 0 :  # 非 lora freeze
             M: nn.Module = self.backbone
             for param in M.named_parameters():
                 result = re.match(re.compile('.*transformer.layers.(\\d+)'),param[0])
                 if result is not None:
                     n_layer = int(result.group(1))
-                    if n_layer < global_num_layers_freeze:
+                    if n_layer < global_args['num_layers_freeze']:
                         param[1].requires_grad = False
                         print('freeze layer',param[0])
 

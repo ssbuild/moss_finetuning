@@ -11,12 +11,12 @@ from models import MyTransformer, MossTokenizer,LoraArguments,PromptArguments
 
 if __name__ == '__main__':
     train_info_args['seed'] = None
-    parser = HfArgumentParser((ModelArguments, DataArguments))
-    model_args, training_args, data_args, _,_ = parser.parse_dict(train_info_args)
+    parser = HfArgumentParser((ModelArguments, DataArguments,))
+    model_args, data_args = parser.parse_dict(train_info_args, allow_extra_keys=True)
 
     
 
-    dataHelper = NN_DataHelper(model_args, training_args, data_args)
+    dataHelper = NN_DataHelper(model_args, None, data_args)
     tokenizer: MossTokenizer
     tokenizer, _, _, _ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer, config_class_name=MossConfig,config_kwargs={"torch_dtype": "float16"})
 
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     lora_args = LoraArguments.from_pretrained(ckpt_dir)
     assert lora_args.inference_mode == True
 
-    pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args,
+    pl_model = MyTransformer(config=config, model_args=model_args, lora_args=lora_args,
                              # load_in_8bit=global_args["load_in_8bit"],
                              # # device_map="auto",
                              # device_map = {"":0} # 第一块卡

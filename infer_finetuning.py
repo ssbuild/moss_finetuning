@@ -19,7 +19,7 @@ if __name__ == '__main__':
     train_info_args['model_name_or_path'] = None
 
     parser = HfArgumentParser((ModelArguments, DataArguments,))
-    model_args, data_args, _, _ = parser.parse_dict(train_info_args, allow_extra_keys=True)
+    model_args, data_args = parser.parse_dict(train_info_args, allow_extra_keys=True)
     
 
     dataHelper = NN_DataHelper(model_args, None, data_args)

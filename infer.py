@@ -9,7 +9,7 @@ from models import MyTransformer,MossConfig,MossTokenizer
 if __name__ == '__main__':
     train_info_args['seed'] = None
     parser = HfArgumentParser((ModelArguments, DataArguments, ))
-    model_args, data_args, _,_ = parser.parse_dict(train_info_args,allow_extra_keys=True)
+    model_args, data_args = parser.parse_dict(train_info_args,allow_extra_keys=True)
 
     dataHelper = NN_DataHelper(model_args, None, data_args)
     tokenizer: MossConfig
@@ -28,6 +28,8 @@ if __name__ == '__main__':
 
     query = response + "\n<|Human|>: 推荐五部科幻电影<eoh>\n<|MOSS|>:"
     response = model.chat(tokenizer, query, max_length=2048,
+
+                          
                                    eos_token_id=config.eos_token_id,
                                    do_sample=True, top_p=0.7, temperature=0.95,
                                    )

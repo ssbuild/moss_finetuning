@@ -41,6 +41,8 @@ class TokenUnSupervision:
         input_ids_all = []
         for idx, session in enumerate(examples):
             question, answer = session['q'], session['a']
+            if isinstance(answer, list):
+                answer = '\n'.join(answer)
             text = question + answer
             ids = tokenizer.encode(text=text)
             if len(ids) <= 3:
@@ -69,6 +71,8 @@ class TokenSupervision:
         ds = []
         for idx, session in enumerate(examples):
             question, answer = session['q'], session['a']
+            if isinstance(answer, list):
+                answer = '\n'.join(answer)
             a_ids = tokenizer.encode(text=question,add_special_tokens=False)[:max_seq_length-2]
             b_ids = tokenizer.encode(text=answer, add_special_tokens=False)
             assert len(b_ids)
@@ -90,6 +94,8 @@ class TokenSupervisionRounds:
         prompt_text = ''
         for idx, session in enumerate(examples):
             question, answer = session['q'], session['a']
+            if isinstance(answer, list):
+                answer = '\n'.join(answer)
             if idx == 0:
                 a_text = question
             else:

@@ -87,6 +87,19 @@ class MyMossForCausalLM(MossForCausalLM):
         # self.transformer.gradient_checkpointing = True
         self.extra_param = DefaultParam()
 
+
+    def geerate_text(self,tokenizer,text: str,max_length=2048,do_sample=False, top_p=0.7, temperature=0.95,**kwargs):
+        tokens = tokenizer.encode_plus(text, max_length=512, truncation=True, return_tensors='pt')
+        input_ids, attention_mask = tokens['input_ids'], tokens['attention_mask']
+
+        input_ids = input_ids.to(self.device)
+        attention_mask = attention_mask.to(self.device)
+        response = self.generate(input_ids=input_ids, attention_mask=attention_mask,
+                                 max_length=max_length, do_sample=do_sample, top_p=top_p, temperature=temperature, **kwargs)
+
+        response = tokenizer.decode(response[0])
+        return response
+
     @torch.no_grad()
     def chat(self,tokenizer: MossTokenizer, text: str, **kwargs):
         self.extra_param.init_control(tokenizer)

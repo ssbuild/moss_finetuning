@@ -107,7 +107,7 @@ class MyTransformer(MyTransformerMossForCausalLM,SftWeightMinMax, with_pl=True):
             return [(self.backbone, lr)]
         return super(MyTransformer, self).get_model_lr(model, lr)
 
-    def get_llm_model(self) -> PreTrainedModel:
+    def get_llm_model(self) -> MyMossForCausalLM:
         if self.lora_args is not None and self.lora_args.with_lora:
             return self.backbone.model.model
         elif self.prompt_args is not None and self.prompt_args.with_prompt:

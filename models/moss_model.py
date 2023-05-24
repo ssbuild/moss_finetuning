@@ -85,9 +85,6 @@ class MyMossForCausalLM(MossForCausalLM):
     def __init__(self,config):
         super(MyMossForCausalLM, self).__init__(config)
         # self.transformer.gradient_checkpointing = True
-        if load_in_8bit:
-            setattr(self, 'model_parallel', True)
-            setattr(self, 'is_parallelizable', True)
         self.extra_param = DefaultParam()
 
     @torch.no_grad()

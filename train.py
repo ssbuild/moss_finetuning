@@ -122,9 +122,13 @@ if __name__ == '__main__':
         # lora int8 precision='32'
         precision='32' if global_args['load_in_8bit'] else '16',# 可以自行尝试  "32": "32-true", "16": "16-mixed", "bf16": "bf16-mixed"
     )
+    config_kwargs = {"torch_dtype": "float16"}
+    if global_args["num_layers"] > 0:
+        config_kwargs["n_layer"] = global_args["num_layers"]
 
     dataHelper = NN_DataHelper(model_args, training_args, data_args)
-    tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,config_class_name=MossConfig,config_kwargs={"torch_dtype": "float16"})
+    tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,
+                                                                  config_class_name=MossConfig,config_kwargs=config_kwargs)
 
     # 额外参数
     checkpoint_callback.tokenizer = tokenizer

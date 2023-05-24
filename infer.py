@@ -17,8 +17,7 @@ if __name__ == '__main__':
 
     pl_model = MyTransformer(config=config, model_args=model_args)
     model = pl_model.get_llm_model()
-    model.half().cuda()
-    model = model.eval()
+    model.eval().half().cuda()
 
     query =  "<|Human|>: 你好<eoh>\n<|MOSS|>:"
     response = model.chat(tokenizer, query, max_length=2048,

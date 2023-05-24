@@ -2,6 +2,7 @@
 # @Time    : 2023/3/9 15:29
 import os
 
+import torch
 from deep_training.data_helper import ModelArguments, DataArguments
 from deep_training.nlp.models.moss import MossConfig
 from transformers import HfArgumentParser
@@ -26,11 +27,16 @@ if __name__ == '__main__':
     assert prompt_args.inference_mode == True
 
     pl_model = MyTransformer(config=config, model_args=model_args, prompt_args=prompt_args)
-    # 加载lora权重
-    pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_dir, prompt_config=prompt_args)
+    # 加载权重
+    pl_model.load_sft_weight(ckpt_dir)
+
     pl_model.eval().half().cuda()
 
     model = pl_model.get_llm_model()
+    # 基础模型精度
+    model.base_model_torch_dtype = torch.half
+
+
     query = "<|Human|>: 你好<eoh>\n<|MOSS|>:"
     response = model.chat(tokenizer, query,  max_length=2048,
                           eos_token_id=config.eos_token_id,

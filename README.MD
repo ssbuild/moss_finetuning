@@ -2,6 +2,7 @@
 - [deep_training](https://github.com/ssbuild/deep_training)
 
 ```text
+    05-24 fix p-tuning-v2 load weight bugs
     05-12 fix lora int8 多卡训练 
     05-02 增加p-tuning-v2
     04-28 deep_training 0.1.3 pytorch-lightning 改名 ligntning ，旧版本 deep_training <= 0.1.2

@@ -3,7 +3,6 @@
 
 from collections import OrderedDict
 from models.moss_model import *
-from config import global_args
 
 
 
@@ -33,11 +32,13 @@ class SftWeightMinMax:
         assert os.path.exists(sft_weight_path)
         if self.lora_args is not None and self.lora_args.with_lora:
             # 恢复权重
-            self.backbone.load_weight(pretrained_model_name_or_path=sft_weight_path,is_trainable=is_trainable)
+            self.backbone: LoraModel
+            self.backbone.load_adapter(sft_weight_path, adapter_name="default", is_trainable=is_trainable)
 
         elif self.prompt_args is not None and self.prompt_args.with_prompt:
             # 恢复权重
-            self.backbone.load_weight(pretrained_model_name_or_path=sft_weight_path, is_trainable=is_trainable)
+            self.backbone: PromptModel
+            self.backbone.load_adapter(sft_weight_path, adapter_name="default", is_trainable=is_trainable)
         else:
             weight_dict = torch.load(sft_weight_path)
             weights_dict_new = OrderedDict()
@@ -76,39 +77,53 @@ class MyTransformer(MyTransformerMossForCausalLM,SftWeightMinMax, with_pl=True):
     def __init__(self, *args, **kwargs):
         lora_args: LoraConfig = kwargs.pop('lora_args',None)
         prompt_args: PromptLearningConfig = kwargs.pop('prompt_args', None)
+        num_layers_freeze = kwargs.pop('num_layers_freeze', -1)
         super(MyTransformer, self).__init__(*args, **kwargs)
         self.lora_args = lora_args
         self.prompt_args = prompt_args
 
         if lora_args is not None and lora_args.with_lora:
             self.backbone.enable_input_require_grads()
-            model: LoraModel = LoraModel(self.backbone, lora_args)
-            print('==' * 30,'lora info')
+            model: LoraModel = LoraModel(self.backbone, lora_args, auto_prepare_kbit_training=False)
+            print('==' * 30, 'lora info')
             model.print_trainable_parameters()
             self.set_model(model, copy_attr=False)
+            # for name, module in model.named_modules():
+            #     if isinstance(module, LoraLayer):
+            #         module = module.to(torch.bfloat16)
+            #     if 'norm' in name:
+            #         module = module.to(torch.float32)
+            #     if 'lm_head' in name or 'embed_tokens' in name:
+            #         if hasattr(module, 'weight'):
+            #             if module.weight.dtype == torch.float32:
+            #                 module = module.to(torch.bfloat16)
         elif prompt_args is not None and prompt_args.with_prompt:
             self.backbone.enable_input_require_grads()
             model: PromptModel = get_prompt_model(self.backbone, prompt_args)
             print('==' * 30, 'prompt info')
             model.print_trainable_parameters()
             self.set_model(model, copy_attr=False)
-        elif global_args['num_layers_freeze'] > 0 :  # 非 lora freeze
+        elif num_layers_freeze > 0 :  # 非 lora freeze
             M: nn.Module = self.backbone
             for param in M.named_parameters():
                 result = re.match(re.compile('.*transformer.layers.(\\d+)'),param[0])
                 if result is not None:
                     n_layer = int(result.group(1))
-                    if n_layer < global_args['num_layers_freeze']:
+                    if n_layer < num_layers_freeze:
                         param[1].requires_grad = False
                         print('freeze layer',param[0])
 
     def get_model_lr(self, model=None, lr=None):
+        # for n, p in self.named_parameters():
+        #     print(n, p.requires_grad)
         lr = lr if lr is not None else self.config.task_specific_params['learning_rate']
-        if self.prompt_args and self.prompt_args.with_prompt:
+        if self.lora_args is not None and self.lora_args.with_lora:
+            return [(self.backbone, lr)]
+        elif self.prompt_args and self.prompt_args.with_prompt:
             return [(self.backbone, lr)]
         return super(MyTransformer, self).get_model_lr(model, lr)
 
-    def get_llm_model(self) -> MyMossForCausalLM:
+    def get_llm_model(self) -> PreTrainedModel:
         if self.lora_args is not None and self.lora_args.with_lora:
             return self.backbone.model.model
         elif self.prompt_args is not None and self.prompt_args.with_prompt:

@@ -24,6 +24,41 @@ global_args = {
 if global_args['load_in_4bit'] != True:
     global_args['quantization_config'] = None
 
+
+lora_info_args = {
+    'with_lora': True,  # 是否启用lora模块
+    'r': 8,
+    'target_modules': ['qkv_proj'],
+    'target_dtype': 16, # 半精度
+    'lora_alpha': 32,
+    'lora_dropout': 0.1,
+    'bias': 'none',  # Bias type for Lora. Can be 'none', 'all' or 'lora_only'"
+    'modules_to_save' : None, # "help": "List of modules apart from LoRA layers to be set as trainable and saved in the final checkpoint. "
+}
+
+adalora_info_args = {
+    'with_lora': False,  # 是否启用adalora模块
+    'r': 8,
+    'target_modules': ['qkv_proj'],
+    'target_dtype': 16, # 半精度
+    'lora_alpha': 32,
+    'lora_dropout': 0.1,
+    'bias': 'none',  # Bias type for Lora. Can be 'none', 'all' or 'lora_only'"
+    'modules_to_save' : None, # "help": "List of modules apart from LoRA layers to be set as trainable and saved in the final checkpoint. "
+
+    'target_r':8, # Target Lora matrix dimension.
+    'init_r': 12, #Intial Lora matrix dimension.
+    'tinit': 0, #The steps of initial warmup.
+    'tfinal': 0, #The steps of final warmup.
+    'deltaT': 1, #Step interval of rank allocation.
+    'beta1': 0.85, #Hyperparameter of EMA.
+    'beta2': 0.85, #Hyperparameter of EMA.
+    'orth_reg_weight': 0.5, #The orthogonal regularization coefficient.
+    'total_step': None, #The total training steps.
+    'rank_pattern': None, #The saved rank pattern.
+}
+
+
 train_info_args = {
     'devices': 1,
     'data_backend': 'record',  #one of record lmdb, 超大数据集可以使用 lmdb , 注 lmdb 存储空间比record大
@@ -83,9 +118,18 @@ train_info_args = {
     'use_fast_tokenizer': False,
     'do_lower_case': False,
 
+    ##############  lora模块
+    #注意lora,adalora 和 ptuning-v2 禁止同时使用
+   'lora': {**lora_info_args},
+   'adalora': {**adalora_info_args},
 
 }
 
 
 if global_args['load_in_8bit'] == global_args['load_in_4bit'] and global_args['load_in_8bit'] == True:
     raise Exception('load_in_8bit and load_in_4bit only set one at same time!')
+
+if lora_info_args['with_lora'] == adalora_info_args['with_lora'] and lora_info_args['with_lora'] == True:
+    raise Exception('lora and adalora can set one at same time !')
+
+

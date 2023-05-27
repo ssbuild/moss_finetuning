@@ -12,7 +12,14 @@ global_args = {
     "load_in_4bit": False,
 
     #load_in_4bit 量化配置
-    "quantization_config": None,
+    "quantization_config": BitsAndBytesConfig(
+        load_in_4bit = True,
+        llm_int8_threshold=6.0,
+        llm_int8_has_fp16_weight=False,
+        bnb_4bit_compute_dtype=torch.float16,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4",
+    ),
     "config_merge": {
 
     },
@@ -23,6 +30,54 @@ global_args = {
 
 if global_args['load_in_4bit'] != True:
     global_args['quantization_config'] = None
+
+
+lora_info_args = {
+    'with_lora': True,  # 是否启用lora模块
+    'r': 8,
+    'target_modules': ['qkv_proj'],
+    'target_dtype': 16, # 半精度
+    'lora_alpha': 32,
+    'lora_dropout': 0.1,
+    'bias': 'none',  # Bias type for Lora. Can be 'none', 'all' or 'lora_only'"
+    'modules_to_save' : None, # "help": "List of modules apart from LoRA layers to be set as trainable and saved in the final checkpoint. "
+}
+
+adalora_info_args = {
+    'with_lora': False,  # 是否启用adalora模块
+    'r': 8,
+    'target_modules': ['qkv_proj'],
+    'target_dtype': 16, # 半精度
+    'lora_alpha': 32,
+    'lora_dropout': 0.1,
+    'bias': 'none',  # Bias type for Lora. Can be 'none', 'all' or 'lora_only'"
+    'modules_to_save' : None, # "help": "List of modules apart from LoRA layers to be set as trainable and saved in the final checkpoint. "
+
+    'target_r':8, # Target Lora matrix dimension.
+    'init_r': 12, #Intial Lora matrix dimension.
+    'tinit': 0, #The steps of initial warmup.
+    'tfinal': 0, #The steps of final warmup.
+    'deltaT': 1, #Step interval of rank allocation.
+    'beta1': 0.85, #Hyperparameter of EMA.
+    'beta2': 0.85, #Hyperparameter of EMA.
+    'orth_reg_weight': 0.5, #The orthogonal regularization coefficient.
+    'total_step': None, #The total training steps.
+    'rank_pattern': None, #The saved rank pattern.
+}
+
+prompt_info_args = {
+    "with_prompt": False,
+    "prompt_type": "prefix_tuning", # one of prompt_tuning,p_tuning,prefix_tuning,adaption_prompt
+    "task_type": "causal_lm", #  one of seq_cls,seq_2_seq_lm,causal_lm,token_cls
+    "prefix_projection": False, # Whether to project the prefix tokens"
+    "num_virtual_tokens": 16, # Number of virtual tokens
+    # "token_dim": 2048, # The hidden embedding dimension of the base transformer model.
+    # "num_transformer_submodules": 1, # The number of transformer submodules in the base transformer model.
+    # "num_attention_heads" : 24, # The number of attention heads in the base transformer model.
+    # "num_layers": 1, # The number of layers in the base transformer model.
+    # "encoder_hidden_size": 2048, # The hidden size of the encoder
+    # "prefix_projection": False # Whether to project the prefix tokens"
+}
 
 train_info_args = {
     'devices': 1,
@@ -83,9 +138,19 @@ train_info_args = {
     'use_fast_tokenizer': False,
     'do_lower_case': False,
 
-
+    ##############  lora模块
+    #注意lora,adalora 和 ptuning-v2 禁止同时使用
+   'lora': {**lora_info_args},
+   'adalora': {**adalora_info_args},
+   'prompt': {**prompt_info_args}
 }
 
 
 if global_args['load_in_8bit'] == global_args['load_in_4bit'] and global_args['load_in_8bit'] == True:
     raise Exception('load_in_8bit and load_in_4bit only set one at same time!')
+
+if lora_info_args['with_lora'] == adalora_info_args['with_lora'] and lora_info_args['with_lora'] == True:
+    raise Exception('lora and adalora can set one at same time !')
+
+if lora_info_args['with_lora'] == prompt_info_args['with_prompt'] and lora_info_args['with_lora'] == True:
+    raise Exception('lora and prompt can set one at same time !')

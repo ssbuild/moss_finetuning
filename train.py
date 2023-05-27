@@ -105,6 +105,22 @@ if __name__ == '__main__':
     if deepspeed_config is not None and len(deepspeed_config):
         strategy = DeepSpeedStrategy(config=deepspeed_config,)
 
+    config_kwargs = {"torch_dtype": "float16"}
+    if global_args["n_layer"] > 0:
+        config_kwargs["n_layer"] = global_args["n_layer"]
+
+    dataHelper = NN_DataHelper(model_args, training_args, data_args)
+    tokenizer, config, _, _ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,
+                                                                   config_class_name=MossConfig,
+                                                                   config_kwargs=config_kwargs)
+
+    # 缓存数据集
+    if data_args.do_train:
+        dataHelper.make_dataset_with_args(data_args.train_file, mixed_data=False, shuffle=True, mode='train')
+    if data_args.do_eval:
+        dataHelper.make_dataset_with_args(data_args.eval_file, mode='eval')
+    if data_args.do_test:
+        dataHelper.make_dataset_with_args(data_args.test_file, mode='test')
 
 
     trainer = Trainer(
@@ -119,16 +135,9 @@ if __name__ == '__main__':
         accumulate_grad_batches=training_args.gradient_accumulation_steps,
         num_sanity_val_steps=0,
         strategy=strategy,
-        # lora int8 precision='32'
-        precision='32' if global_args['load_in_8bit'] else '16',# 可以自行尝试  "32": "32-true", "16": "16-mixed", "bf16": "bf16-mixed"
+        precision='32' ,# 可以自行尝试  "32": "32-true", "16": "16-mixed", "bf16": "bf16-mixed"
     )
-    config_kwargs = {"torch_dtype": "float16"}
-    if global_args["num_layers"] > 0:
-        config_kwargs["n_layer"] = global_args["num_layers"]
 
-    dataHelper = NN_DataHelper(model_args, training_args, data_args)
-    tokenizer, config, _,_ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,
-                                                                  config_class_name=MossConfig,config_kwargs=config_kwargs)
 
     # 额外参数
     checkpoint_callback.tokenizer = tokenizer
@@ -136,37 +145,19 @@ if __name__ == '__main__':
 
     config.save_pretrained('best_ckpt')
 
-    # 缓存数据集
-    if data_args.do_train:
-        dataHelper.make_dataset_with_args(data_args.train_file,mixed_data=False,shuffle=True,mode='train')
-    if data_args.do_eval:
-        dataHelper.make_dataset_with_args(data_args.eval_file, mode='eval')
-    if data_args.do_test:
-        dataHelper.make_dataset_with_args(data_args.test_file,mode='test')
-
 
     pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args,prompt_args=prompt_args,
-                             load_in_8bit=global_args['load_in_8bit'], device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto")
+                             quantization_config=global_args["quantization_config"],
+                             num_layers_freeze=global_args["num_layers_freeze"],
+                             load_in_8bit=global_args["load_in_8bit"],
+                             device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto",
+                             torch_dtype=torch.float16, )
+
+    # 加载sft权重
+    # pl_model.load_sft_weight('./best_ckpt/best.pt',is_trainable=True)
 
     pl_model.float()
 
-
-    #  只恢复权重 ， 不恢复步数和优化器 ，
-    #  如果想恢复步数， 修改 trainer.fit(pl_model, train_dataloaders=train_datasets，ckpt=ckpt_path)  注lora 当前不支持恢复步数。
-    # if os.path.exists(ckpt_path):
-    #     if lora_args is not None:
-    #         # 加载lora权重 继续训练  0.0.20版本支持lora 继续训练
-    #         pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,lora_config=lora_args, is_trainable=True,
-    #                                           load_in_8bit=load_in_8bit, device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto",strict=False)
-    #     elif prompt_args is not None:
-    #         raise ValueError('prompt is not support continue training')
-    #         # pl_model.backbone.from_pretrained(pl_model.backbone.model, pretrained_model_name_or_path=ckpt_path,
-    #         #                                   lora_config=lora_args, is_trainable=True, strict=False)
-    #     else:
-    #         # 加载权重继续训练
-    #         pl_model = MyTransformer.load_from_checkpoint(ckpt_path, config=config, model_args=model_args,
-    #                                                       training_args=training_args, lora_args=lora_args,
-    #                                                       prompt_args=prompt_args, strict=False)
 
     def dataset_loader_filter_fn(dataset):
         print('*' * 30, 'total count', len(dataset))

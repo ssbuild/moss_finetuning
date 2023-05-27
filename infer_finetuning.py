@@ -30,7 +30,7 @@ if __name__ == '__main__':
     config = MossConfig.from_pretrained('./best_ckpt')
     config.initializer_weight = False
 
-    pl_model = MyTransformer(config=config, model_args=model_args, strict=False)
+    pl_model = MyTransformer(config=config, model_args=model_args)
     if deep_config is None:
         train_weight = './best_ckpt/last-v3.ckpt'
         assert os.path.exists(train_weight)

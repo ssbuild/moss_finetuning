@@ -24,6 +24,21 @@ global_args = {
 if global_args['load_in_4bit'] != True:
     global_args['quantization_config'] = None
 
+
+prompt_info_args = {
+    "with_prompt": True,
+    "prompt_type": "prefix_tuning", # one of prompt_tuning,p_tuning,prefix_tuning,adaption_prompt
+    "task_type": "causal_lm", #  one of seq_cls,seq_2_seq_lm,causal_lm,token_cls
+    "prefix_projection": False, # Whether to project the prefix tokens"
+    "num_virtual_tokens": 32, # Number of virtual tokens
+    # "token_dim": 2048, # The hidden embedding dimension of the base transformer model.
+    # "num_transformer_submodules": 1, # The number of transformer submodules in the base transformer model.
+    # "num_attention_heads" : 24, # The number of attention heads in the base transformer model.
+    # "num_layers": 1, # The number of layers in the base transformer model.
+    # "encoder_hidden_size": 2048, # The hidden size of the encoder
+    # "prefix_projection": False # Whether to project the prefix tokens"
+}
+
 train_info_args = {
     'devices': 1,
     'data_backend': 'record',  #one of record lmdb, 超大数据集可以使用 lmdb , 注 lmdb 存储空间比record大
@@ -83,9 +98,13 @@ train_info_args = {
     'use_fast_tokenizer': False,
     'do_lower_case': False,
 
+    ##############  lora模块
+    #注意lora,adalora 和 ptuning-v2 禁止同时使用
 
+   'prompt': {**prompt_info_args}
 }
 
 
 if global_args['load_in_8bit'] == global_args['load_in_4bit'] and global_args['load_in_8bit'] == True:
     raise Exception('load_in_8bit and load_in_4bit only set one at same time!')
+

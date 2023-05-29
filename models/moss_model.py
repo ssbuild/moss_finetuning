@@ -3,22 +3,11 @@
 # @Author  : tk
 # @FileName: moss_model
 
-import copy
-import os
-import re
 import time
-import warnings
-from typing import List, Tuple, Optional, Callable
 import torch
-from torch import nn
 from deep_training.nlp.models.moss import MossForCausalLM,MossConfig
 from deep_training.nlp.models.moss.tokenization_moss import MossTokenizer
-from deep_training.nlp.models.lora.v2 import LoraArguments, LoraModel,LoraConfig
-from deep_training.nlp.models.prompt import PromptModel,PromptArguments,get_prompt_model,PromptLearningConfig
 from deep_training.nlp.models.transformer import TransformerBase
-from transformers import PreTrainedModel
-
-
 
 def convert_tokens_to_string(self, tokens):
     """Converts a sequence of tokens (string) in a single string."""

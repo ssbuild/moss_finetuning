@@ -13,7 +13,7 @@ train_model_config = train_info_models['moss-moon-003-sft']
 
 
 global_args = {
-    "load_in_8bit": False, # lora 如果显卡支持int8 可以开启
+    "load_in_8bit": False, 
     "load_in_4bit": False,
 
     #load_in_4bit 量化配置

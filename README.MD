@@ -2,7 +2,7 @@
 - [deep_training](https://github.com/ssbuild/deep_training)
 
 ```text
-    06-01 support deepspeed training for lora adalora prompt , 0.1.10 和 0.1.10合并
+    06-01 support deepspeed training for lora adalora prompt , 0.1.9 和 0.1.10合并
     05-27 add qlora transformers>=4.30
     05-24 fix p-tuning-v2 load weight bugs
     05-12 fix lora int8 多卡训练 

@@ -2,6 +2,7 @@
 - [deep_training](https://github.com/ssbuild/deep_training)
 
 ```text
+    06-01 support deepspeed training for lora adalora prompt
     05-27 add qlora transformers>=4.30
     05-24 fix p-tuning-v2 load weight bugs
     05-12 fix lora int8 多卡训练 
@@ -15,6 +16,10 @@
   - pip install -i https://pypi.org/simple -U -r requirements.txt
   - pip install triton #如果推理量化模
 
+```text
+dev 
+pip install -U -i https://pypi.org/simple --pre deep_training==0.1.10
+```
 
 ## weight
 
@@ -54,12 +59,13 @@
 
 
 ## 切换训练模式配置
-    修改 config/__init__.py       “from config.sft_config import *”  切换配置文件
-    config/sft_config.py            finetuning
-    config/sft_config_lora.py       lora finetuning
-    config/sft_config_lora_int4.py  lora int4 finetuning
-    config/sft_config_lora_int8.py  lora int8 finetuning
-    config/sft_config_ptv2.py       lora p-tuning-v2 finetuning
+    修改 config/main.py
+    # 模块配置， 默认启用lora
+    enable_deepspeed = False
+    enable_ptv2 = True
+    enable_lora = True
+    enable_int8 = False # qlora int8
+    enable_int4 = False # qlora int4
 
 ## infer
     # infer.py 推理预训练模型

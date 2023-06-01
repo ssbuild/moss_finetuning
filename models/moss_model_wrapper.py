@@ -2,10 +2,10 @@
 # @Author  : ssbuild
 # @Time    : 2023/5/29 16:14
 import re
-from deep_training.nlp.models.prompt import get_prompt_model,PromptArguments
+from deep_training.trainer.pl.modelweighter import *
 from torch import nn
 from models.moss_model import MyTransformerMossForCausalLM,MossConfig,MossTokenizer
-from models.model_weight import *
+
 
 
 class MyTransformer(MyTransformerMossForCausalLM,ModelWeightMinMax, with_pl=True):

@@ -32,7 +32,6 @@ if global_args['load_in_4bit'] != True:
 train_info_args = {
     'devices': 1,
     'data_backend': 'record',  #one of record lmdb, 超大数据集可以使用 lmdb , 注 lmdb 存储空间比record大
-    'model_type': 'moss',
     # 预训练模型路径
     **train_model_config,
 

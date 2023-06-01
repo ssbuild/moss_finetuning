@@ -11,7 +11,7 @@ from config.constant_map import train_info_models, train_target_modules_maps
 train_model_config = train_info_models['moss-moon-003-sft']
 
 global_args = {
-    "load_in_8bit": False,  
+    "load_in_8bit": False,
     "load_in_4bit": False,
 
     # load_in_4bit 量化配置
@@ -71,7 +71,6 @@ adalora_info_args = {
 train_info_args = {
     'devices': 1,
     'data_backend': 'record',  #one of record lmdb, 超大数据集可以使用 lmdb , 注 lmdb 存储空间比record大
-    'model_type': 'moss',
     # 预训练模型路径
     **train_model_config,
 

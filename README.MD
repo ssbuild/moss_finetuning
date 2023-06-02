@@ -54,32 +54,16 @@ pip install -U -i https://pypi.org/simple --pre deep_training==0.1.10
  
 
 
-
-
-
-
-## 切换训练模式配置
-    修改 config/main.py
-    # 模块配置， 默认启用lora
-    enable_deepspeed = False
-    enable_ptv2 = True
-    enable_lora = True
-    enable_int8 = False # qlora int8
-    enable_int4 = False # qlora int4
-
 ## infer
     # infer.py 推理预训练模型
     # infer_finetuning.py 推理微调模型
     # infer_lora_finetuning.py 推理lora微调模型
      python infer.py
 
+## 训练参数
+[训练参数](args.MD)
 
 ## finetuning
-    支持以下微调方式 
-- 冻结 N 层 修改models.py global_num_layers_freeze    
-- lora
-- ptv2
-- 正常微调
 ```text
     #制作数据集
     python data_utils.py
@@ -92,45 +76,6 @@ pip install -U -i https://pypi.org/simple --pre deep_training==0.1.10
 ```
 
 
-### 单机多卡
-```text
-可见的前两块卡
-train_info_args = {
-    'devices': 2,
-}
-
-# 第一块 和 第三块卡
-train_info_args = {
-    'devices': [0,2],
-}
-```
-
-### 多机多卡训练
-```text
-例子 3个机器 每个机器 4个卡
-修改train.py Trainer num_nodes = 3
-MASTER_ADDR=10.0.0.1 MASTER_PORT=6667 WORLD_SIZE=12 NODE_RANK=0 python train.py 
-MASTER_ADDR=10.0.0.1 MASTER_PORT=6667 WORLD_SIZE=12 NODE_RANK=1 python train.py 
-MASTER_ADDR=10.0.0.1 MASTER_PORT=6667 WORLD_SIZE=12 NODE_RANK=2 python train.py 
-```
-
-
-### lora finetuning
-    with_lora
-
-### ptv2
-   with_prompt
-
-### int高效训练方式
-   lora int8  修改modes.py load_in_8bit = True  修改data_utils.py 对应with_lora=True
-
-## deepspeed
-    启动则将data_utils.py  修改 enable_deepspeed 
-    lora 模式暂时不支持deepspeed
-
-
-## 精度训练
-     precision='16' #  #可以自行尝试  "32": "32-true", "16": "16-mixed", "bf16": "bf16-mixed"
 
 ## Reference
     https://huggingface.co/fnlp

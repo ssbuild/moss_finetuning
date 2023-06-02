@@ -60,10 +60,9 @@ pip install -U -i https://pypi.org/simple --pre deep_training==0.1.10
     # infer_lora_finetuning.py 推理lora微调模型
      python infer.py
 
-## 训练参数
-[训练参数](args.MD)
 
-## finetuning
+
+## training
 ```text
     #制作数据集
     python data_utils.py
@@ -75,7 +74,8 @@ pip install -U -i https://pypi.org/simple --pre deep_training==0.1.10
     python train.py
 ```
 
-
+## 训练参数
+[训练参数](args.MD)
 
 ## Reference
     https://huggingface.co/fnlp

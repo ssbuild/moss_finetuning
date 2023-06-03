@@ -6,9 +6,14 @@ import os
 import torch
 from transformers import BitsAndBytesConfig
 
-#如果显卡支持int8 可以开启
+from config.constant_map import train_info_models
+
+# 量化权重不支持此模式训练
+train_model_config = train_info_models['moss-moon-003-sft']
+
+
 global_args = {
-    "load_in_8bit": False, # lora 如果显卡支持int8 可以开启
+    "load_in_8bit": False, 
     "load_in_4bit": False,
 
     #load_in_4bit 量化配置
@@ -27,23 +32,22 @@ if global_args['load_in_4bit'] != True:
 train_info_args = {
     'devices': 1,
     'data_backend': 'record',  #one of record lmdb, 超大数据集可以使用 lmdb , 注 lmdb 存储空间比record大
-    'model_type': 'moss',
-    # 预训练模型路径 , 从0训练，则置空
-    'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft',
-    'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft/config.json',
-    'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft',
+    # 预训练模型路径
+    **train_model_config,
 
-    # 'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4',
-    # 'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4/config.json',
-    # 'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4',
 
     'convert_onnx': False, # 转换onnx模型
     'do_train': True,
     'train_file':  [ './data/finetune_train_examples.json'],
     'max_epochs': 20,
     'max_steps': -1,
-    'optimizer': 'lion', # one of [lamb,adamw_hf,adamw,adamw_torch,adamw_torch_fused,adamw_torch_xla,adamw_apex_fused,adafactor,adamw_anyprecision,sgd,adagrad,adamw_bnb_8bit,adamw_8bit,lion_8bit,lion_32bit,paged_adamw_32bit,paged_adamw_8bit,paged_lion_32bit,paged_lion_8bit]
 
+    # lamb,adma,adamw_hf,adam,adamw,adamw_torch,adamw_torch_fused,adamw_torch_xla,adamw_apex_fused,
+    # adafactor,adamw_anyprecision,sgd,adagrad,adamw_bnb_8bit,adamw_8bit,lion,lion_8bit,lion_32bit,
+    # paged_adamw_32bit,paged_adamw_8bit,paged_lion_32bit,paged_lion_8bit,
+    # lamb_fused_dp adagrad_cpu_dp adam_cpu_dp adam_fused_dp
+
+    'optimizer': 'lion',
     'scheduler_type': 'CAWR', #one of [linear,WarmupCosine,CAWR,CAL,Step,ReduceLROnPlateau, cosine,cosine_with_restarts,polynomial,constant,constant_with_warmup,inverse_sqrt,reduce_lr_on_plateau]
     'scheduler':{'T_mult': 1, 'rewarm_epoch_num': 0.5, 'verbose': False},
 

@@ -20,7 +20,7 @@ if __name__ == '__main__':
     tokenizer: MossTokenizer
     tokenizer, _, _, _ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer, config_class_name=MossConfig,config_kwargs={"torch_dtype": "float16"})
 
-    ckpt_dir = './best_ckpt'
+    ckpt_dir = './best_ckpt/last'
     config = MossConfig.from_pretrained(ckpt_dir)
     config.initializer_weight = False
     lora_args = LoraArguments.from_pretrained(ckpt_dir)

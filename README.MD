@@ -19,10 +19,9 @@
 ```text
 dev 版本可通过下列方式安装 
 pip 安装rc 版本
-pip install -U --pre -i https://pypi.org/simple deep_training==0.1.10rc 
-pip install -U bitsandbytes>=0.39
+pip install -U -i https://pypi.org/simple deep_training==0.1.10
+pip install -U bitsandbytes>=0.39 accelerate>=0.19
 pip install -q -U git+https://github.com/huggingface/transformers.git
-pip install -q -U git+https://github.com/huggingface/accelerate.git
 ```
 
 ## weight

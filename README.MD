@@ -2,6 +2,7 @@
 - [deep_training](https://github.com/ssbuild/deep_training)
 
 ```text
+    06-13 support resize_token_embeddings
     06-01 support deepspeed training for lora adalora prompt , 0.1.9 和 0.1.10合并
     05-27 add qlora transformers>=4.30
     05-24 fix p-tuning-v2 load weight bugs
@@ -16,14 +17,7 @@
   - pip install -i https://pypi.org/simple -U -r requirements.txt
   - pip install triton #如果推理量化模
 
-```text
-dev 版本可通过下列方式安装 
-pip 安装rc 版本
-pip install -U --pre -i https://pypi.org/simple deep_training==0.1.10rc 
-pip install -U bitsandbytes>=0.39
-pip install -q -U git+https://github.com/huggingface/transformers.git
-pip install -q -U git+https://github.com/huggingface/accelerate.git
-```
+
 
 ## weight
 
@@ -78,11 +72,10 @@ pip install -q -U git+https://github.com/huggingface/accelerate.git
     python train.py
 ```
 
+
+
 ## 训练参数
 [训练参数](args.MD)
-
-## Reference
-    https://huggingface.co/fnlp
 
 ## 友情链接
 
@@ -95,6 +88,11 @@ pip install -q -U git+https://github.com/huggingface/accelerate.git
 - [rlhf_llm](https://github.com/ssbuild/rlhf_llm)
 - [rlhf_chatglm](https://github.com/ssbuild/rlhf_chatglm)
 - [rlhf_chatyuan](https://github.com/ssbuild/rlhf_chatyuan)
+- [rwkv_finetuning](https://github.com/ssbuild/rwkv_finetuning)
 
 ## 
     纯粹而干净的代码
+
+
+## Reference
+    https://huggingface.co/fnlp

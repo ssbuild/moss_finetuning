@@ -5,17 +5,21 @@ import re
 from deep_training.trainer.pl.modelweighter import *
 from torch import nn
 from models.moss_model import MyTransformerMossForCausalLM,MossConfig,MossTokenizer
-
+import logging
+logger = logging.getLogger(__name__)
 
 
 class MyTransformer(MyTransformerMossForCausalLM,ModelWeightMinMax, with_pl=True):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args,new_num_tokens=None, **kwargs):
         lora_args: LoraConfig = kwargs.pop('lora_args',None)
         prompt_args: PromptLearningConfig = kwargs.pop('prompt_args', None)
         num_layers_freeze = kwargs.pop('num_layers_freeze', -1)
         super(MyTransformer, self).__init__(*args, **kwargs)
         self.lora_args = lora_args
         self.prompt_args = prompt_args
+
+        # 可能扩充词表
+        self.resize_token_embs(new_num_tokens)
 
         if lora_args is not None and lora_args.with_lora:
             self.backbone.enable_input_require_grads()
@@ -47,6 +51,17 @@ class MyTransformer(MyTransformerMossForCausalLM,ModelWeightMinMax, with_pl=True
                     if n_layer < num_layers_freeze:
                         param[1].requires_grad = False
                         print('freeze layer',param[0])
+
+    def resize_token_embs(self, new_num_tokens):
+        if new_num_tokens is not None:
+            logger.info(f"new_num_tokens:{new_num_tokens}")
+            model: PreTrainedModel = self.backbone.model
+            embedding_size = model.get_input_embeddings().weight.shape[0]
+            if new_num_tokens != embedding_size:
+                logger.info("resize the embedding size by the size of the tokenizer")
+                # print('before',self.config)
+                model.resize_token_embeddings(new_num_tokens)
+                # print('after',self.config)
 
     def get_model_lr(self, model=None, lr=None):
         # for n, p in self.named_parameters():

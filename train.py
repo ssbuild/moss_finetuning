@@ -29,7 +29,6 @@ if __name__ == '__main__':
     tokenizer, config, _, _ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,
                                                                    config_class_name=MossConfig,
                                                                    config_kwargs=config_kwargs)
-    config.save_pretrained(output_weight_dir)
 
     # 缓存数据集
     if data_args.do_train:
@@ -76,7 +75,11 @@ if __name__ == '__main__':
                              num_layers_freeze=global_args["num_layers_freeze"],
                              load_in_8bit=global_args["load_in_8bit"],
                              device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto",
-                             torch_dtype=torch.float16, )
+                             torch_dtype=torch.float16,
+                             new_num_tokens=len(tokenizer),  # 可能扩充词
+                             )
+
+    config.save_pretrained(output_weight_dir)
 
     # 加载sft权重
     # pl_model.load_sft_weight('./best_ckpt/best.pt',is_trainable=True)

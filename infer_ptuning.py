@@ -25,7 +25,7 @@ if __name__ == '__main__':
     prompt_args = PromptArguments.from_pretrained(ckpt_dir)
     assert prompt_args.inference_mode == True
 
-    pl_model = MyTransformer(config=config, model_args=model_args, prompt_args=prompt_args)
+    pl_model = MyTransformer(config=config, model_args=model_args, prompt_args=prompt_args, torch_dtype=torch.float16,)
     # 加载权重
     pl_model.load_sft_weight(ckpt_dir)
 

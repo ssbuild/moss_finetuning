@@ -14,7 +14,8 @@
    
 
 ## install 
-  - pip install -i https://pypi.org/simple -U -r requirements.txt
+  - pip install -r requirements.txt
+  - 如果无法安装， 可以切换官方源 pip install -i https://pypi.org/simple -U -r requirements.txt
   - pip install triton #如果推理量化模
 
 

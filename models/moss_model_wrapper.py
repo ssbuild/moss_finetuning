@@ -64,7 +64,7 @@ class MyTransformer(MyTransformerMossForCausalLM,ModelWeightMinMax, with_pl=True
                     config = model.config
                     if config.task_specific_params is None:
                         config.task_specific_params = {}
-                    config.task_specific_paramstask_specific_params['vocab_size'] = config.vocab_size
+                    config.task_specific_params['vocab_size'] = config.vocab_size
 
                 logger.info("resize the embedding size by the size of the tokenizer")
                 # print('before',self.config)

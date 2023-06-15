@@ -25,7 +25,12 @@ if __name__ == '__main__':
     prompt_args = PromptArguments.from_pretrained(ckpt_dir)
     assert prompt_args.inference_mode == True
 
-    pl_model = MyTransformer(config=config, model_args=model_args, prompt_args=prompt_args, torch_dtype=torch.float16,)
+    new_num_tokens = config.vocab_size
+    if config.task_specific_params is not None and config.task_specific_params.get('vocab_size', None) is not None:
+        config.vocab_size = config.task_specific_params['vocab_size']
+
+    pl_model = MyTransformer(config=config, model_args=model_args, prompt_args=prompt_args,
+                             torch_dtype=torch.float16,new_num_tokens=new_num_tokens,)
     # 加载权重
     pl_model.load_sft_weight(ckpt_dir)
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/3/9 15:29
+import torch
 from deep_training.data_helper import ModelArguments, DataArguments
 from transformers import HfArgumentParser
 

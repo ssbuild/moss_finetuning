@@ -10,6 +10,7 @@ from transformers import HfArgumentParser
 
 from data_utils import train_info_args, NN_DataHelper, get_deepspeed_config
 from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossTokenizer,MossConfig
+from aigc_zoo.utils.moss_generate import Generate
 
 deep_config = get_deepspeed_config()
 
@@ -45,8 +46,10 @@ if __name__ == '__main__':
     model = pl_model.get_llm_model()
     model.eval().half().cuda()
 
+    gen_core = Generate(model, tokenizer)
+
     query = "<|Human|>: 如果一个女性想要发展信息技术行业，她应该做些什么？<eoh>\n<|MOSS|>:"
-    response = model.chat(tokenizer, query,  max_length=2048,
+    response = gen_core.chat(query,  max_length=2048,
                           # do_sample=False, top_p=0.7, temperature=0.95,
                           )
     print(query, ' 返回: ', response)

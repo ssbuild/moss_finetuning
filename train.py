@@ -7,10 +7,9 @@ from lightning import Trainer
 from lightning.pytorch.callbacks import LearningRateMonitor
 from lightning.pytorch.strategies import DeepSpeedStrategy
 from transformers import HfArgumentParser
-
 from config import global_args
 from data_utils import NN_DataHelper, train_info_args, get_deepspeed_config
-from models import MyTransformer,MossTokenizer,MossConfig,LoraArguments,PromptArguments
+from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossTokenizer,MossConfig,LoraArguments,PromptArguments
 
 
 if __name__ == '__main__':

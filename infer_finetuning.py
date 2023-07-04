@@ -9,7 +9,7 @@ from deep_training.data_helper import ModelArguments, DataArguments
 from transformers import HfArgumentParser
 
 from data_utils import train_info_args, NN_DataHelper, get_deepspeed_config
-from models import MyTransformer,MossTokenizer,MossConfig
+from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossTokenizer,MossConfig
 
 deep_config = get_deepspeed_config()
 

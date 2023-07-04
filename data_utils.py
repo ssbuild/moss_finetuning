@@ -10,7 +10,7 @@ from deep_training.data_helper import DataHelper, ModelArguments, TrainingArgume
 from fastdatasets.record import load_dataset as Loader, RECORD, WriterObject, gfile
 from tqdm import tqdm
 from transformers import HfArgumentParser,PreTrainedTokenizer
-from models import MyTransformer,MossConfig,MossTokenizer,LoraArguments,PromptArguments
+from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossConfig,MossTokenizer,LoraArguments,PromptArguments
 
 from data_processer import DataStrategy, TokenSupervision, TokenUnSupervision, TokenSupervisionRounds, \
     TokenRoundsForMoss

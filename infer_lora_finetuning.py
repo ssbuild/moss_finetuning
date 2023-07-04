@@ -8,7 +8,7 @@ from deep_training.nlp.models.moss import MossConfig
 from transformers import HfArgumentParser
 
 from data_utils import train_info_args, NN_DataHelper,global_args
-from models import MyTransformer, MossTokenizer,LoraArguments,PromptArguments
+from aigc_zoo.model_zoo.moss.llm_model import MyTransformer, MossTokenizer,LoraArguments,PromptArguments
 
 if __name__ == '__main__':
     train_info_args['seed'] = None

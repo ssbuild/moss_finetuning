@@ -30,12 +30,7 @@ if __name__ == '__main__':
                                                                    config_kwargs=config_kwargs)
 
     # 缓存数据集
-    if data_args.do_train:
-        dataHelper.make_dataset_with_args(data_args.train_file, mixed_data=False, shuffle=True, mode='train')
-    if data_args.do_eval:
-        dataHelper.make_dataset_with_args(data_args.eval_file, mode='eval')
-    if data_args.do_test:
-        dataHelper.make_dataset_with_args(data_args.test_file, mode='test')
+    dataHelper.make_dataset_all()
 
     checkpoint_callback = ModelCheckpointEx(
         # monitor='loss',

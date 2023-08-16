@@ -19,11 +19,11 @@ if __name__ == '__main__':
     train_info_args['seed'] = None
     train_info_args['model_name_or_path'] = None
 
-    parser = HfArgumentParser((ModelArguments, DataArguments,))
-    model_args, data_args = parser.parse_dict(train_info_args, allow_extra_keys=True)
+    parser = HfArgumentParser((ModelArguments,))
+    (model_args, ) = parser.parse_dict(train_info_args, allow_extra_keys=True)
     
 
-    dataHelper = NN_DataHelper(model_args, None, data_args)
+    dataHelper = NN_DataHelper(model_args)
     tokenizer: MossTokenizer
     tokenizer, _, _, _ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer, config_class_name=MossConfig,config_kwargs={"torch_dtype": "float16"})
     ###################### 注意 选最新权重

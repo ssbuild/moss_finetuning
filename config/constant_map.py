@@ -11,18 +11,42 @@ train_info_models = {
         'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft/config.json',
         'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft',
     },
+    'moss-moon-003-sft-plugin': {
+        'model_type': 'moss',
+        'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin',
+        'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin',
+    },
+    # 官方量化
+    'moss-moon-003-sft-int4-gptq': {
+        'model_type': 'moss',
+        'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4-gptq',
+        'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4-gptq/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4-gptq',
+    },
+
+    # 官方量化
+    'moss-moon-003-sft-plugin-int4-gptq': {
+        'model_type': 'moss',
+        'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin-int4-gptq',
+        'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin-int4-gptq/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin-int4-gptq',
+    },
+
     'moss-moon-003-sft-int4': {
         'model_type': 'moss',
         'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4',
         'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4/config.json',
         'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int4',
     },
-    'moss-moon-003-sft-int8': {
+
+    'moss-moon-003-sft-plugin-int4': {
         'model_type': 'moss',
-        'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int8',
-        'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int8/config.json',
-        'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-int8',
+        'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin-int4',
+        'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin-int4/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/moss/mmoss-moon-003-sft-plugin-int4',
     },
+
 }
 
 

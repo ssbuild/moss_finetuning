@@ -27,10 +27,12 @@
 - [moss-moon-003-base](https://huggingface.co/fnlp/moss-moon-003-base): MOSS-003基座模型，在高质量中英文语料上自监督预训练得到，预训练语料包含约700B单词，计算量约6.67x10<sup>22</sup>次浮点数运算。
 - [moss-moon-003-sft](https://huggingface.co/fnlp/moss-moon-003-sft): 基座模型在约110万多轮对话数据上微调得到，具有指令遵循能力、多轮对话能力、规避有害请求能力。
 - [moss-moon-003-sft-plugin](https://huggingface.co/fnlp/moss-moon-003-sft-plugin): 基座模型在约110万多轮对话数据和约30万插件增强的多轮对话数据上微调得到，在`moss-moon-003-sft`基础上还具备使用搜索引擎、文生图、计算器、解方程等四种插件的能力。
-- [moss-moon-003-sft-int4](https://huggingface.co/fnlp/moss-moon-003-sft-int4/tree/main): 4bit量化版本的`moss-moon-003-sft`模型，约占用12GB显存即可进行推理。
-- [moss-moon-003-sft-int8](https://huggingface.co/fnlp/moss-moon-003-sft-int8): 8bit量化版本的`moss-moon-003-sft`模型，约占用24GB显存即可进行推理。
-- [moss-moon-003-sft-plugin-int4](https://huggingface.co/fnlp/moss-moon-003-sft-plugin-int4): 4bit量化版本的`moss-moon-003-sft-plugin`模型，约占用12GB显存即可进行推
+- [moss-moon-003-sft-int4-gptq](https://huggingface.co/fnlp/moss-moon-003-sft-int4/tree/main): 4bit量化版本的`moss-moon-003-sft`模型，约占用12GB显存即可进行推理。
+- [moss-moon-003-sft-plugin-int4-gptq](https://huggingface.co/fnlp/moss-moon-003-sft-plugin-int4): 4bit量化版本的`moss-moon-003-sft-plugin`模型，约占用12GB显存即可进行推
+- [moss-moon-003-sft-int4](https://huggingface.co/ssbuild/moss-moon-003-sft-int4/tree/main)
+- [moss-moon-003-sft-plugin-int4](https://huggingface.co/ssbuild/moss-moon-003-sft-plugin-int4)
     
+
 
 ## data sample
     数据示例如下:
@@ -83,15 +85,19 @@
 ## 友情链接
 
 - [pytorch-task-example](https://github.com/ssbuild/pytorch-task-example)
-- [tf-task-example](https://github.com/ssbuild/tf-task-example)
 - [chatmoss_finetuning](https://github.com/ssbuild/chatmoss_finetuning)
 - [chatglm_finetuning](https://github.com/ssbuild/chatglm_finetuning)
-- [chatyuan_finetuning](https://github.com/ssbuild/chatyuan_finetuning)
+- [chatglm2_finetuning](https://github.com/ssbuild/chatglm2_finetuning)
+- [t5_finetuning](https://github.com/ssbuild/t5_finetuning)
 - [llm_finetuning](https://github.com/ssbuild/llm_finetuning)
-- [rlhf_llm](https://github.com/ssbuild/rlhf_llm)
-- [rlhf_chatglm](https://github.com/ssbuild/rlhf_chatglm)
-- [rlhf_chatyuan](https://github.com/ssbuild/rlhf_chatyuan)
+- [llm_rlhf](https://github.com/ssbuild/llm_rlhf)
+- [chatglm_rlhf](https://github.com/ssbuild/chatglm_rlhf)
+- [t5_rlhf](https://github.com/ssbuild/t5_rlhf)
 - [rwkv_finetuning](https://github.com/ssbuild/rwkv_finetuning)
+- [baichuan_finetuning](https://github.com/ssbuild/baichuan_finetuning)
+- [baichuan2_finetuning](https://github.com/ssbuild/baichuan2_finetuning)
+- [internlm_finetuning](https://github.com/ssbuild/internlm_finetuning)
+- [qwen_finetuning](https://github.com/ssbuild/qwen_finetuning)
 
 ## 
     纯粹而干净的代码

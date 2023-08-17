@@ -8,6 +8,10 @@ from data_utils import train_info_args, NN_DataHelper
 from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossConfig,MossTokenizer
 from aigc_zoo.utils.moss_generate import Generate
 
+def build_input(text):
+    query = "<|Human|>: " + text + "<eoh>\n<|MOSS|>:"
+    return query
+
 if __name__ == '__main__':
     train_info_args['seed'] = None
     parser = HfArgumentParser((ModelArguments, ))
@@ -19,15 +23,35 @@ if __name__ == '__main__':
 
     pl_model = MyTransformer(config=config, model_args=model_args, torch_dtype=torch.float16,)
     model = pl_model.get_llm_model()
-    model.eval().half().cuda()
+    if hasattr(model, 'quantize'):
+        # 支持llama llama2量化
+        if not model.quantized:
+            # 按需修改，目前只支持 4/8 bit 量化 ， 可以保存量化模型
+            model.half().quantize(4).cuda()
+            # 保存量化权重
+            # model.save_pretrained('llama2-7b-chat-int4',max_shard_size="2GB")
+            # exit(0)
+        else:
+            # 已经量化
+            model.half().cuda()
+    else:
+        model.half().cuda()
 
     gen_core = Generate(model,tokenizer)
 
-    query =  "<|Human|>: 如果一个女性想要发展信息技术行业，她应该做些什么？<eoh>\n<|MOSS|>:"
-    response = gen_core.chat(query, max_length=2048,
-                          # do_sample=False, top_p=0.7, temperature=0.95,
-                          )
-    print(query,' 返回: ',response)
+    text_lists = [
+        "你是谁",
+        "请以冬天为题写一首诗",
+        "如果一个女性想要发展信息技术行业，她应该做些什么"
+    ]
+    for text in text_lists:
+        query = build_input(text)
+
+        response = gen_core.chat(query, max_length=2048,
+                              do_sample=True, top_p=0.7, temperature=0.95,
+                              )[len(query):]
+        print('input: ',query)
+        print('output: ', response)
 
     # query = response + "\n<|Human|>: 推荐五部科幻电影<eoh>\n<|MOSS|>:"
     # response = model.chat(tokenizer, query, max_length=2048,

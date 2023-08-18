@@ -63,7 +63,8 @@
     # infer_lora_finetuning.py 推理lora微调模型
      python infer.py
 
-
+![image1](asserts/1.png)
+![image2](asserts/2.png)
 
 ## training
 ```text

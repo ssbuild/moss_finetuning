@@ -44,8 +44,8 @@ class NN_DataHelper(DataHelper):
         tokenizer: MossTokenizer
         config: MossConfig
         max_seq_length = self.max_seq_length_dict[mode]
-        tokenizer = self.tokenizer
-        config = self.config
+        tokenizer = self.tokenizer # noqa
+        config = self.config # noqa
         examples = data
 
         strategy = data_conf['strategy']

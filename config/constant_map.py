@@ -44,7 +44,7 @@ train_info_models = {
         'model_type': 'moss',
         'model_name_or_path': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin-int4',
         'config_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin-int4/config.json',
-        'tokenizer_name': '/data/nlp/pre_models/torch/moss/mmoss-moon-003-sft-plugin-int4',
+        'tokenizer_name': '/data/nlp/pre_models/torch/moss/moss-moon-003-sft-plugin-int4',
     },
 
 }

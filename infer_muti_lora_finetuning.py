@@ -66,7 +66,7 @@ if __name__ == '__main__':
         meta_instruction = None  # 默认指令
         for query in text_lists:
             response, history = lora_model.chat(tokenizer=tokenizer,query=query,history = None, meta_instruction=meta_instruction, max_new_tokens=512,
-                                  do_sample=True, top_p=0.7, temperature=0.95, )
+                                  do_sample=True, temperature=0.7, top_p=0.8, repetition_penalty=1.02, )
             print('input: ', query)
             print('output: ', response)
 
@@ -76,6 +76,6 @@ if __name__ == '__main__':
     meta_instruction = None  # 默认指令
     for query in text_lists:
         response, history = lora_model.chat(tokenizer=tokenizer,query=query,history = None, meta_instruction=meta_instruction, max_new_tokens=512,
-                                   do_sample=True, top_p=0.7, temperature=0.95, )
+                                   do_sample=True, temperature=0.7, top_p=0.8, repetition_penalty=1.02, )
         print('input: ', query)
         print('output: ', response)

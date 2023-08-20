@@ -58,11 +58,44 @@ if __name__ == '__main__':
     meta_instruction = None # 默认指令
     for query in text_lists:
 
-        response, history = model.chat(tokenizer=tokenizer,query=query,history = None, meta_instruction=meta_instruction,max_new_tokens=512,
-                              do_sample=True, top_p=0.7, temperature=0.95,
-                              pad_token_id =tokenizer.eos_token_id,
-                              eos_token_id =tokenizer.eos_token_id)
+        response, history = model.chat(tokenizer=tokenizer,query=query,history = None, meta_instruction=meta_instruction,
+                                       plugin_instruction=None,
+                                       max_new_tokens=512,
+                                       do_sample=True,temperature=0.7, top_p=0.8, repetition_penalty=1.02,
+                                       pad_token_id =tokenizer.eos_token_id,
+                                       eos_token_id =tokenizer.eos_token_id)
         print('input: ',query)
         print('output: ', response)
 
 
+
+    enable_plugin = False
+
+    if not enable_plugin:
+        exit(0)
+    # 插件
+    print('plugin....................')
+    plugin_instruction = "- Web search: enabled. API: Search(query)\n- Calculator: disabled.\n- Equation solver: disabled.\n- Text-to-image: disabled.\n- Image edition: disabled.\n- Text-to-speech: disabled.\n"
+
+    query= '黑暗荣耀的主演有谁'
+    response, history = model.chat(tokenizer=tokenizer, query=query, history=None, meta_instruction=meta_instruction,
+                                   plugin_instruction=plugin_instruction,
+                                   max_new_tokens=512,
+                                   do_sample=True, temperature=0.7, top_p=0.8, repetition_penalty=1.02,
+                                   pad_token_id=tokenizer.eos_token_id,
+                                   eos_token_id=tokenizer.eos_token_id)
+
+    print(response)
+    query = '''Search("黑暗荣耀 主演") =>
+<|1|>: "《黑暗荣耀》是由Netflix制作，安吉镐执导，金恩淑编剧，宋慧乔、李到晛、林智妍、郑星一等主演的电视剧，于2022年12月30日在Netflix平台播出。该剧讲述了曾在高中时期 ..."
+<|2|>: "演员Cast · 宋慧乔Hye-kyo Song 演员Actress (饰文东恩) 代表作： 一代宗师 黑暗荣耀 黑暗荣耀第二季 · 李到晛Do-hyun Lee 演员Actor/Actress (饰周汝正) 代表作： 黑暗荣耀 ..."
+<|3|>: "《黑暗荣耀》是编剧金银淑与宋慧乔继《太阳的后裔》后二度合作的电视剧，故事描述梦想成为建筑师的文同珢（宋慧乔饰）在高中因被朴涎镇（林智妍饰）、全宰寯（朴成勋饰）等 ..."
+    '''
+
+    response, history = model.chat(tokenizer=tokenizer, query=query, history=history, meta_instruction=meta_instruction,
+                                   plugin_instruction=plugin_instruction,
+                                   max_new_tokens=512,
+                                   do_sample=True, temperature=0.7, top_p=0.8, repetition_penalty=1.02,
+                                   pad_token_id=tokenizer.eos_token_id,
+                                   eos_token_id=tokenizer.eos_token_id)
+    print(response)

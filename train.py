@@ -9,11 +9,11 @@ from lightning.pytorch.strategies import DeepSpeedStrategy
 from transformers import HfArgumentParser
 from config import global_args
 from data_utils import NN_DataHelper, train_info_args, get_deepspeed_config
-from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossTokenizer,MossConfig,LoraArguments,PromptArguments
+from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossTokenizer,MossConfig,EffiArguments,PromptArguments
 
 
 if __name__ == '__main__':
-    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, LoraArguments,PromptArguments))
+    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, EffiArguments,PromptArguments))
     model_args, training_args, data_args, lora_args,prompt_args = parser.parse_dict(train_info_args)
     lora_args = lora_args.config
     prompt_args = prompt_args.config
@@ -48,6 +48,17 @@ if __name__ == '__main__':
     strategy = 'ddp' if torch.cuda.device_count() > 1 else 'auto'
     if deepspeed_config is not None and len(deepspeed_config):
         strategy = DeepSpeedStrategy(config=deepspeed_config, )
+
+    is_bf16_supported = torch.cuda.is_bf16_supported()
+    # 精度 根据实际情况做调整
+    if is_bf16_supported:
+        precision = 'bf16'
+    else:
+        precision = '16'
+
+    if global_args["quantization_config"] is not None and global_args["quantization_config"].load_in_8bit:
+        precision = "32"
+
     trainer = Trainer(
         callbacks=[checkpoint_callback,LearningRateMonitor(logging_interval='step')],
         max_epochs=training_args.max_epochs,
@@ -60,14 +71,13 @@ if __name__ == '__main__':
         accumulate_grad_batches=training_args.gradient_accumulation_steps,
         num_sanity_val_steps=0,
         strategy=strategy,
-        precision='16' ,# 可以自行尝试  "32": "32-true", "16": "16-mixed", "bf16": "bf16-mixed"
+        precision=precision ,# 可以自行尝试  "32": "32-true", "16": "16-mixed", "bf16": "bf16-mixed"
     )
 
 
     pl_model = MyTransformer(config=config, model_args=model_args, training_args=training_args,lora_args=lora_args,prompt_args=prompt_args,
                              quantization_config=global_args["quantization_config"],
                              num_layers_freeze=global_args["num_layers_freeze"],
-                             load_in_8bit=global_args["load_in_8bit"],
                              device_map={"": trainer.local_rank} if trainer.world_size > 1 else "auto",
                              torch_dtype=torch.float16,
                              new_num_tokens=len(tokenizer),  # 可能扩充词
@@ -78,7 +88,8 @@ if __name__ == '__main__':
     # 加载sft权重
     # pl_model.load_sft_weight('./best_ckpt/best.pt',is_trainable=True)
 
-    pl_model.float()
+
+    pl_model = pl_model.float() if not is_bf16_supported else pl_model.bfloat16()
 
 
     def dataset_loader_filter_fn(dataset):

@@ -8,7 +8,7 @@ from deep_training.nlp.models.moss import MossConfig
 from transformers import HfArgumentParser
 
 from data_utils import train_info_args, NN_DataHelper,global_args
-from aigc_zoo.model_zoo.moss.llm_model import MyTransformer, MossTokenizer,LoraArguments,PromptArguments,LoraModel
+from aigc_zoo.model_zoo.moss.llm_model import MyTransformer, MossTokenizer,EffiArguments,PromptArguments,PetlModel
 
 
 if __name__ == '__main__':
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     ckpt_dir = './best_ckpt/last'
     config = MossConfig.from_pretrained(ckpt_dir)
     config.initializer_weight = False
-    lora_args = LoraArguments.from_pretrained(ckpt_dir)
+    lora_args = EffiArguments.from_pretrained(ckpt_dir)
     assert lora_args.inference_mode == True
 
     new_num_tokens = config.vocab_size
@@ -49,8 +49,8 @@ if __name__ == '__main__':
 
     pl_model.eval().half().cuda()
 
-    # backbone model replaced LoraModel
-    lora_model: LoraModel = pl_model.backbone
+    # backbone model replaced PetlModel
+    lora_model: PetlModel = pl_model.backbone
 
     text_lists = [
         "你是谁",

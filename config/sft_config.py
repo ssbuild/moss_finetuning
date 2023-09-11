@@ -25,8 +25,6 @@ global_args = {
 }
 
 
-if global_args['load_in_4bit'] != True:
-    global_args['quantization_config'] = None
 
 train_info_args = {
     'devices': 1,

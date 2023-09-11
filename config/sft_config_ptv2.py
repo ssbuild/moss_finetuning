@@ -26,8 +26,6 @@ global_args = {
 }
 
 
-if global_args['load_in_4bit'] != True:
-    global_args['quantization_config'] = None
 
 
 prompt_info_args = {

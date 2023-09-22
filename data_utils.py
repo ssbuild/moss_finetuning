@@ -10,8 +10,7 @@ from deep_training.data_helper import DataHelper, ModelArguments, TrainingArgume
 from fastdatasets.record import load_dataset as Loader, RECORD, WriterObject, gfile
 from tqdm import tqdm
 from transformers import HfArgumentParser,PreTrainedTokenizer
-from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossConfig,MossTokenizer,EffiArguments,PromptArguments
-
+from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossConfig,MossTokenizer,PetlArguments,PromptArguments
 from data_processer import DataStrategy, TokenSupervision, TokenUnSupervision, TokenSupervisionRounds, \
     TokenRoundsForMoss
 
@@ -140,7 +139,7 @@ class NN_DataHelper(DataHelper):
             self.make_dataset_with_args(data_args.test_file, mode='test', schema=schema)
 
 if __name__ == '__main__':
-    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, EffiArguments,PromptArguments))
+    parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, PetlArguments,PromptArguments))
     model_args, training_args, data_args, _,_ = parser.parse_dict(train_info_args)
 
     dataHelper = NN_DataHelper(model_args, training_args, data_args)

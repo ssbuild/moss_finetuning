@@ -11,6 +11,7 @@ from config import global_args
 from data_utils import NN_DataHelper, train_info_args, get_deepspeed_config
 from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossTokenizer,MossConfig,PetlArguments,PromptArguments
 
+assert global_args["trainer_backend"] == "pl"
 
 if __name__ == '__main__':
     parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, PetlArguments,PromptArguments))

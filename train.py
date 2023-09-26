@@ -11,6 +11,7 @@ from config import global_args
 from data_utils import NN_DataHelper, train_info_args, get_deepspeed_config
 from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossTokenizer,MossConfig,PetlArguments,PromptArguments
 
+assert global_args["trainer_backend"] == "pl"
 
 if __name__ == '__main__':
     parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, PetlArguments,PromptArguments))
@@ -20,9 +21,9 @@ if __name__ == '__main__':
 
     output_weight_dir = './best_ckpt'
 
-    config_kwargs = {"torch_dtype": "float16"}
-    if global_args["n_layer"] > 0:
-        config_kwargs["n_layer"] = global_args["n_layer"]
+    config_kwargs = {"torch_dtype": torch.float16}
+    if global_args[ 'config_merge' ]:
+        config_kwargs.update(global_args[ 'config_merge' ])
 
     dataHelper = NN_DataHelper(model_args, training_args, data_args)
     tokenizer, config, _, _ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer,

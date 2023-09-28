@@ -3,7 +3,7 @@
 
 import json
 import os
-from config.constant_map import train_info_models,train_model_config
+from config.constant_map import train_model_config
 
 
 prompt_info_args = {

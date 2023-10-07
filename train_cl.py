@@ -82,10 +82,6 @@ def main():
         training_args.fp16 = False
         training_args.bf16 = False
 
-    deepspeed_config = get_deepspeed_config(precision)
-    if deepspeed_config:
-        training_args.deepspeed = deepspeed_config
-
     # Log on each process the small summary:
     logger.warning(
         f"Process rank: {training_args.local_rank}"

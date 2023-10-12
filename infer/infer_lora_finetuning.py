@@ -22,10 +22,11 @@ if __name__ == '__main__':
     tokenizer: MossTokenizer
     tokenizer, _, _, _ = dataHelper.load_tokenizer_and_config(tokenizer_class_name=MossTokenizer, config_class_name=MossConfig,config_kwargs={"torch_dtype": "float16"})
 
-    ckpt_dir = './best_ckpt/last'
-    config = MossConfig.from_pretrained(ckpt_dir)
+    weight_dir = '../scripts/best_ckpt'
+    lora_weight_dir = os.path.join(weight_dir, "last")
+    config = MossConfig.from_pretrained(weight_dir)
     config.initializer_weight = False
-    lora_args = PetlArguments.from_pretrained(ckpt_dir)
+    lora_args = PetlArguments.from_pretrained(lora_weight_dir)
     assert lora_args.inference_mode == True
 
     new_num_tokens = config.vocab_size
@@ -39,14 +40,14 @@ if __name__ == '__main__':
                              # device_map = {"":0} # 第一块卡
                              )
     # 加载lora权重
-    pl_model.load_sft_weight(ckpt_dir)
+    pl_model.load_sft_weight(lora_weight_dir)
 
     pl_model.eval().half().cuda()
 
     enable_merge_weight = False
     if enable_merge_weight:
         # 合并lora 权重 保存
-        pl_model.save_pretrained_merge_lora(os.path.join(ckpt_dir, 'pytorch_model_merge.bin'))
+        pl_model.save_pretrained_merge_lora(os.path.join(lora_weight_dir, 'pytorch_model_merge.bin'))
     else:
         model = pl_model.get_llm_model()
         model = model.eval().half()

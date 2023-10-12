@@ -16,7 +16,7 @@ from aigc_zoo.model_zoo.moss.llm_model import MyTransformer,MossTokenizer,MossCo
 
 assert global_args["trainer_backend"] == "pl"
 
-if __name__ == '__main__':
+def main():
     parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, PetlArguments,PromptArguments))
     model_args, training_args, data_args, lora_args,prompt_args = parser.parse_dict(train_info_args)
     lora_args = lora_args.config
@@ -119,3 +119,12 @@ if __name__ == '__main__':
     )
 
     trainer.fit(pl_model, train_dataloaders=train_datasets)
+
+
+def _mp_fn(index):
+    # For xla_spawn (TPUs)
+    main()
+
+
+if __name__ == "__main__":
+    main()
